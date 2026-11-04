@@ -94,6 +94,8 @@ void main() {
     expect(zenn.lastLimit, 50);
     expect((await stock())['q1']!.origin, 'batch');
     expect(File('${repo.absDir((await stock())['q1']!)}/index.html').existsSync(), isTrue);
+    // 一覧に冒頭がない記事は、保存した本文から冒頭を作る
+    expect((await stock())['z1']!.summary, 'zenn z1');
   });
 
   test('入れ替え：未閲覧は削除、閲覧済・既読はキャッシュ、個別DL・いいね・新セットは残す', () async {

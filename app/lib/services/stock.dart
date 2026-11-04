@@ -35,6 +35,18 @@ class StockRepo extends ChangeNotifier {
     _root = Directory(p.join((await getApplicationSupportDirectory()).path, 'articles'));
     await _root.create(recursive: true);
     await _reloadKeys();
+    await _backfillSummaries();
+  }
+
+  /// 冒頭（summary）がない保存済み記事に、本文ファイルから冒頭を補う
+  Future<void> _backfillSummaries() async {
+    final rows = await _db.query('stock_articles', columns: ['id', 'dir_path'], where: "summary IS NULL OR summary = ''");
+    for (final r in rows) {
+      final f = File(p.join(_root.path, r['dir_path'] as String, 'index.html'));
+      if (!await f.exists()) continue;
+      final text = plainExcerpt(await f.readAsString());
+      if (text.isNotEmpty) await _db.update('stock_articles', {'summary': text}, where: 'id = ?', whereArgs: [r['id']]);
+    }
   }
 
   Database get db => _db;
@@ -153,7 +165,8 @@ class StockRepo extends ChangeNotifier {
       'title': summary.title,
       'author': summary.author,
       'tags_json': jsonEncode(summary.tags),
-      'summary': summary.summary,
+      // Zenn など一覧に冒頭がないサイトは、保存した本文から作る
+      'summary': (summary.summary == null || summary.summary!.isEmpty) ? plainExcerpt(content.html) : summary.summary,
       'thumbnail_path': thumb,
       'dir_path': rel,
       'size_bytes': size,

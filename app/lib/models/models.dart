@@ -48,6 +48,22 @@ class ArticleSummary {
 
   /// サイト固有の情報（Qiita の本文 HTML、Zenn の slug、note の key など）
   final Map<String, Object?> extra;
+
+  ArticleSummary copyWith({String? summary, String? thumbnailUrl, Map<String, Object?>? extra}) => ArticleSummary(
+        source: source,
+        sourceKey: sourceKey,
+        url: url,
+        title: title,
+        author: author,
+        tags: tags,
+        summary: summary ?? this.summary,
+        thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+        likes: likes,
+        publishedAt: publishedAt,
+        isPaidPartial: isPaidPartial,
+        emoji: emoji,
+        extra: extra ?? this.extra,
+      );
 }
 
 /// 全文（サニタイズ前の HTML）

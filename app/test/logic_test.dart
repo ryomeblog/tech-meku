@@ -141,6 +141,24 @@ void main() {
     });
   });
 
+  group('Zenn の冒頭補完', () {
+    test('詳細から冒頭と最初の画像を補い、全文表示では再取得しない', () async {
+      var calls = 0;
+      final client = MockClient((req) async {
+        calls++;
+        return http.Response.bytes(utf8.encode(jsonEncode({'article': {'body_html': '<p>本文の冒頭です</p><img src="https://img/z.png">'}})), 200);
+      });
+      final z = ZennSource(SourceHttp(client));
+      final s = ArticleSummary(source: SourceType.zenn, sourceKey: 'https://zenn.dev/x/articles/a', url: 'https://zenn.dev/x/articles/a', title: 'A', extra: {'slug': 'a'});
+      final e = await z.enrich(s);
+      expect(e.summary, '本文の冒頭です');
+      expect(e.thumbnailUrl, 'https://img/z.png');
+      expect(e.title, 'A');
+      await z.fetchContent(e);
+      expect(calls, 1);
+    });
+  });
+
   group('note', () {
     test('有料記事の判定、直近7日のいいね順、URL の組み立て', () async {
       final now = DateTime.now();

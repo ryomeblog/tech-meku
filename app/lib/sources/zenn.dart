@@ -59,8 +59,22 @@ class ZennSource implements ArticleSource {
     return merged.take(limit).toList();
   }
 
+  /// 一覧には本文の冒頭がないため、詳細を取って冒頭と最初の画像を補う。
+  /// 取った本文は extra['html'] に入れ、全文表示で再取得しない
+  Future<ArticleSummary> enrich(ArticleSummary s) async {
+    final c = await fetchContent(s);
+    final images = c.imageUrls;
+    return s.copyWith(
+      summary: plainExcerpt(c.html),
+      thumbnailUrl: images.isEmpty ? null : images.first,
+      extra: {...s.extra, 'html': c.html},
+    );
+  }
+
   @override
   Future<ArticleContent> fetchContent(ArticleSummary summary) async {
+    final cached = summary.extra['html'] as String?;
+    if (cached != null && cached.isNotEmpty) return ArticleContent(html: cached, imageUrls: extractImageUrls(cached));
     final slug = summary.extra['slug'] as String? ?? Uri.parse(summary.url).pathSegments.last;
     final j = await _http.getJson(Uri.https('zenn.dev', '/api/articles/$slug')) as Map<String, dynamic>;
     final a = j['article'] as Map<String, dynamic>? ?? const {};

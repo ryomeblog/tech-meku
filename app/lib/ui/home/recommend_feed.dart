@@ -11,6 +11,7 @@ import '../../services/sources.dart';
 import '../../services/stock.dart';
 import '../../services/tags.dart';
 import '../../sources/article_source.dart';
+import '../../sources/zenn.dart';
 import '../common/actions.dart';
 import '../common/widgets.dart';
 import '../tags/tag_select_page.dart';
@@ -33,6 +34,8 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
   String? _tag; // null = すべて
   SourceType? _site; // null = 設定で ON のサイトすべて。app = TechMeku の投稿
   final Map<String, Post> _posts = {}; // TechMeku の投稿（投稿ID → Post）
+  final Set<String> _enriching = {};
+  int _index = 0;
   bool _loading = false;
   bool _initial = true;
   int _gen = 0;
@@ -82,6 +85,8 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
     _done.clear();
     _errors.clear();
     _posts.clear();
+    _enriching.clear();
+    _index = 0;
     _initial = true;
     _loading = false;
     _tagLabels = TagService.instance.current().map((t) => t.label).toList();
@@ -128,6 +133,7 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
       _loading = false;
       _initial = false;
     });
+    _enrichAround(_index);
   }
 
   /// #TechMeku：みんなの投稿を新しい順に。タグを選んでいればそのタグの投稿だけ
@@ -155,6 +161,22 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
       _loading = false;
       _initial = false;
     });
+  }
+
+  /// Zenn のカードは一覧に冒頭がないので、表示中と次の2枚だけ詳細を取って補う
+  void _enrichAround(int i) {
+    final zenn = Sources.instance.of(SourceType.zenn);
+    if (zenn is! ZennSource) return;
+    for (var k = i; k < i + 3 && k < _items.length; k++) {
+      final a = _items[k];
+      if (a.source != SourceType.zenn || (a.summary?.isNotEmpty ?? false) || !_enriching.add(a.sourceKey)) continue;
+      final gen = _gen;
+      zenn.enrich(a).then((e) {
+        if (gen != _gen || !mounted) return;
+        final idx = _items.indexWhere((x) => x.source == SourceType.zenn && x.sourceKey == a.sourceKey);
+        if (idx >= 0) setState(() => _items[idx] = e);
+      }).catchError((_) {});
+    }
   }
 
   @override
@@ -220,6 +242,8 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
                     scrollDirection: Axis.vertical,
                     itemCount: _items.length + 1,
                     onPageChanged: (i) {
+                      _index = i;
+                      _enrichAround(i);
                       // 末尾から5枚目を表示したら次のページを読み込む（設計判断 #12）
                       if (i >= _items.length - 5) _loadMore();
                     },
