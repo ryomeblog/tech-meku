@@ -215,7 +215,8 @@ class ArticleCard extends StatelessWidget {
           ),
         ),
       ),
-      Positioned(right: 8, bottom: 24, child: rail),
+      // アクションはタイトルの横の高さから並べる（親指が届きやすく、記事と対応が分かる位置）
+      Positioned(right: 8, top: 48, child: rail),
     ]);
   }
 }
