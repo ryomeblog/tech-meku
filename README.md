@@ -99,6 +99,22 @@ flutter run --dart-define=API_BASE=http://10.0.2.2:8787   # エミュレータ�
 
 Google ログインは、Google Cloud の OAuth クライアント（Android・Web）にパッケージ名 `com.ryomeblog.techmeku` とビルドに使う署名の SHA-1 が登録されている必要があります。
 
+#### リリース版のビルド
+
+```sh
+cd app
+flutter build apk --release --target-platform android-arm64   # build/app/outputs/flutter-apk/app-release.apk
+```
+
+署名鍵の設定は `app/android/key.properties`（コミットしない）に書きます。このファイルがない場合は、デバッグ用の鍵で署名します。
+
+```properties
+storeFile=/path/to/techmeku-release.jks
+storePassword=...
+keyAlias=techmeku
+keyPassword=...
+```
+
 ### サーバー（`server/`）
 
 必要なもの：Node.js、Wrangler、Cloudflare アカウント。
