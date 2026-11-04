@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/techmeku_icon_192.png" width="96" alt="TechMeku">
+  <img src="app/assets/brand/techmeku_icon_192.png" width="96" alt="TechMeku">
 </p>
 
 <h1 align="center">TechMeku（テクメク）</h1>
@@ -10,7 +10,7 @@ Qiita・Zenn・note の技術記事を端末に保存し、オフラインでも
 興味タグに合った新着記事を「おすすめ」で流し読みでき、アプリ内で記事を投稿することもできます。投稿は 24 時間で消えますが、いいね・コメントで公開期間が延びます。
 
 > [!NOTE]
-> 現在は **設計段階** です。このリポジトリには設計書、ワイヤーフレーム、アイコン素材が入っています。アプリ本体の実装はこれからです。
+> 現在は **開発中（テスト段階）** です。Google Play での配布はまだ行っていません。
 
 ## 主な機能
 
@@ -35,44 +35,65 @@ Qiita・Zenn・note の技術記事を端末に保存し、オフラインでも
 
 ```
 .
-├── doc/
-│   ├── design.md          # 設計書（仕様・アーキテクチャ・データ設計・実装ステップ）
-│   ├── wireframes.html    # 全画面のワイヤーフレーム（S01〜S16, A01）
-│   └── icon/              # アイコン一覧のプレビューと画面ごとの対応表
-├── assets/
-│   ├── brand/             # アプリアイコン（PNG）
-│   └── icons/             # UI アイコン（SVG 62 種 × default / active / muted）
-├── lib/
-│   ├── techmeku_icon.dart         # TechMekuIcon ウィジェット
-│   └── example_action_rail.dart   # カード右側のアクションボタン列の実装例
-├── icon_manifest.json             # アイコン名・用途・ファイルパスの一覧
-└── pubspec_assets_snippet.yaml    # pubspec.yaml に追加する設定
+├── app/                      # Flutter アプリ（Android）
+│   ├── lib/
+│   │   ├── core/             # 設定値・テーマ・アイコン・端末DB・アプリ設定
+│   │   ├── models/           # データモデル
+│   │   ├── sources/          # Qiita / Zenn / note の取得アダプタ
+│   │   ├── services/         # ストック・一括DL（入れ替え）・サーバーAPI・ログイン・定期DL
+│   │   └── ui/               # 画面（S01〜S16）
+│   ├── assets/               # アプリアイコン（brand）と UI アイコン（icons）
+│   └── test/                 # ユニットテスト
+├── server/                   # Cloudflare Workers（Hono + D1 + R2）
+│   ├── src/                  # API・管理ページ・Cron
+│   ├── migrations/           # D1 スキーマ
+│   └── test/e2e.mjs          # API の E2E テスト（ローカル）
+└── doc/
+    ├── design.md             # 設計書
+    ├── wireframes.html       # 全画面のワイヤーフレーム
+    ├── api-verification.md   # 外部 API の検証結果
+    ├── terms.md / privacy.md # 利用規約・プライバシーポリシー（ドラフト）
+    └── icon/                 # アイコン一覧と画面ごとの対応表
 ```
+
+## 開発
+
+### アプリ（`app/`）
+
+必要なもの：Flutter SDK、Android SDK（Android Studio）、Android 端末またはエミュレーター。
+
+```sh
+cd app
+flutter pub get
+flutter test                 # ユニットテスト
+flutter run                  # 本番サーバー（techmeku-api.ryome-blog.workers.dev）につなぐ
+flutter run --dart-define=API_BASE=http://10.0.2.2:8787   # エミュレーターからローカルの wrangler dev につなぐ
+```
+
+Google ログインは、Google Cloud の OAuth クライアント（Android・Web）にパッケージ名 `com.ryomeblog.techmeku` とビルドに使う署名の SHA-1 が登録されている必要があります。
+
+### サーバー（`server/`）
+
+必要なもの：Node.js、Wrangler、Cloudflare アカウント。
+
+```sh
+cd server
+npm install
+wrangler d1 migrations apply techmeku-db --local
+wrangler dev --test-scheduled      # 別ターミナルで npm test（E2E テスト）
+wrangler deploy                    # 本番へ
+```
+
+シークレット（`SERVER_SECRET` / `SESSION_SECRET` / `IP_SALT_SECRET`）は `wrangler secret put` で登録します。ローカルでは `server/.dev.vars`（コミットしない）に書きます。
+
+管理ページ（`/admin`）は Cloudflare Access で保護します。`wrangler.jsonc` の `ACCESS_TEAM_DOMAIN` と `ACCESS_AUD` を設定するまでは常に 403 を返します。
 
 ## ドキュメント
 
 - [設計書](doc/design.md)：仕様と実装設計。1〜3 章が確定した仕様、4〜9 章が実装設計です
-- [ワイヤーフレーム](doc/wireframes.html)：ブラウザで開いてください。アイコンは `assets/` 以下のファイルを参照しているため、リポジトリをクローンしてから開く必要があります
-- [アイコン対応表](doc/icon/ICON_USAGE.md)：画面ごとに使うアイコンと、Flutter への導入方法
-
-## アイコンの使い方（Flutter）
-
-`pubspec.yaml` に次を追加します。
-
-```yaml
-dependencies:
-  flutter_svg: ^2.0.0
-flutter:
-  assets:
-    - assets/icons/default/
-    - assets/icons/active/
-    - assets/icons/muted/
-    - assets/brand/
-```
-
-```dart
-TechMekuIcon(name: TechMekuIconName.heart, active: liked, size: 24)
-```
+- [ワイヤーフレーム](doc/wireframes.html)：ブラウザで開いてください（アイコンは `app/assets/` を参照するため、クローンしてから開きます）
+- [外部 API の検証結果](doc/api-verification.md)
+- [アイコン対応表](doc/icon/ICON_USAGE.md)
 
 ## ライセンス
 
