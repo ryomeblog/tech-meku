@@ -213,9 +213,8 @@ class _StockFeedState extends State<StockFeed> with AutomaticKeepAliveClientMixi
     return Column(children: [
       _header(c),
       Expanded(
-        child: PageView.builder(
+        child: SwipePager(
           controller: _page,
-          scrollDirection: Axis.vertical,
           itemCount: _items.length + 1,
           onPageChanged: _onShown,
           itemBuilder: (context, i) {

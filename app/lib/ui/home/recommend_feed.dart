@@ -237,9 +237,8 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
                     title: _site == SourceType.app ? 'まだ投稿はありません' : '記事が見つかりませんでした',
                     action: OutlinedButton.icon(onPressed: _restart, icon: const TechMekuIcon(I.refresh, size: 18), label: const Text('再読み込み')),
                   )
-                : PageView.builder(
+                : SwipePager(
                     controller: _page,
-                    scrollDirection: Axis.vertical,
                     itemCount: _items.length + 1,
                     onPageChanged: (i) {
                       _index = i;

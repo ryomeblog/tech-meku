@@ -136,9 +136,8 @@ class _PostsFeedState extends State<PostsFeed> with AutomaticKeepAliveClientMixi
                         body: '下の「＋新規投稿」から投稿できます',
                         action: OutlinedButton.icon(onPressed: _load, icon: const TechMekuIcon(I.refresh, size: 18), label: const Text('更新')),
                       )
-                    : PageView.builder(
+                    : SwipePager(
                         controller: _page,
-                        scrollDirection: Axis.vertical,
                         itemCount: posts.length,
                         itemBuilder: (context, i) {
                           final p = posts[i];

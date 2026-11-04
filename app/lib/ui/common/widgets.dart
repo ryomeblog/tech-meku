@@ -267,3 +267,86 @@ class SectionTitle extends StatelessWidget {
         child: Text(text, style: TextStyle(color: TmColors.of(context).active, fontWeight: FontWeight.bold, fontSize: 13)),
       );
 }
+
+/// スワイプ開始時のページを覚えておく（判定の基準にする）
+class SwipeStart {
+  double? page;
+}
+
+/// 縦スワイプのページ送りを緩めた判定（標準は 50% 以上動かさないと戻る）
+///
+/// - ゆっくり離しても、開始位置から 20% 動いていれば次（前）のページへ
+/// - 少しでも払う勢いがあれば、その向きのページへ
+/// - 1 回のスワイプで進むのは 1 ページまで
+class EasyPagePhysics extends PageScrollPhysics {
+  const EasyPagePhysics(this._start, {super.parent});
+  final SwipeStart _start;
+
+  static const threshold = 0.2;
+
+  @override
+  EasyPagePhysics applyTo(ScrollPhysics? ancestor) => EasyPagePhysics(_start, parent: buildParent(ancestor));
+
+  @override
+  double get minFlingVelocity => 20;
+
+  @override
+  Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
+    if ((velocity <= 0 && position.pixels <= position.minScrollExtent) || (velocity >= 0 && position.pixels >= position.maxScrollExtent)) {
+      return super.createBallisticSimulation(position, velocity);
+    }
+    final vp = position.viewportDimension;
+    if (vp <= 0) return super.createBallisticSimulation(position, velocity);
+    final tol = toleranceFor(position);
+    final page = position.pixels / vp;
+    final start = _start.page ?? page.roundToDouble();
+    double target;
+    if (velocity.abs() > tol.velocity) {
+      target = velocity > 0 ? start + 1 : start - 1;
+    } else {
+      final delta = page - start;
+      target = delta > threshold ? start + 1 : (delta < -threshold ? start - 1 : start);
+    }
+    final targetPixels = (target * vp).clamp(position.minScrollExtent, position.maxScrollExtent);
+    if ((targetPixels - position.pixels).abs() < tol.distance) return null;
+    return ScrollSpringSimulation(spring, position.pixels, targetPixels, velocity, tolerance: tol);
+  }
+}
+
+/// 1 画面 1 カードの縦スワイプ（おすすめ・ストック・みんなの投稿で共通）
+class SwipePager extends StatefulWidget {
+  const SwipePager({super.key, required this.controller, required this.itemCount, required this.itemBuilder, this.onPageChanged});
+  final PageController controller;
+  final int itemCount;
+  final IndexedWidgetBuilder itemBuilder;
+  final ValueChanged<int>? onPageChanged;
+
+  @override
+  State<SwipePager> createState() => _SwipePagerState();
+}
+
+class _SwipePagerState extends State<SwipePager> {
+  final _start = SwipeStart();
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<ScrollStartNotification>(
+      onNotification: (n) {
+        if (n.depth == 0 && n.metrics.axis == Axis.vertical && n.metrics.viewportDimension > 0) {
+          _start.page = (n.metrics.pixels / n.metrics.viewportDimension).roundToDouble();
+        }
+        return false;
+      },
+      child: PageView.builder(
+        controller: widget.controller,
+        scrollDirection: Axis.vertical,
+        // 標準のページ吸着（50% 判定）が外側に重なると緩い判定が効かないため切り、EasyPagePhysics で吸着させる
+        pageSnapping: false,
+        physics: EasyPagePhysics(_start),
+        itemCount: widget.itemCount,
+        onPageChanged: widget.onPageChanged,
+        itemBuilder: widget.itemBuilder,
+      ),
+    );
+  }
+}
