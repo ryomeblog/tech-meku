@@ -56,7 +56,9 @@ class _EditorPageState extends State<EditorPage> with SingleTickerProviderStateM
       if (_tabs.index == 1) _renderPreview();
       setState(() {});
     });
-    _preview.setNavigationDelegate(NavigationDelegate(onNavigationRequest: (r) => r.url.startsWith('http') ? NavigationDecision.prevent : NavigationDecision.navigate));
+    _preview.setNavigationDelegate(
+      NavigationDelegate(onNavigationRequest: (r) => r.url.startsWith('http') ? NavigationDecision.prevent : NavigationDecision.navigate),
+    );
     _loadCounts();
   }
 
@@ -77,7 +79,14 @@ class _EditorPageState extends State<EditorPage> with SingleTickerProviderStateM
     // 新しく選んだ画像はまだ URL がないので data URI で表示する
     final urls = _images.map((i) => i.key != null ? Api.instance.imageUrl(i.key!) : 'data:image/jpeg;base64,${_b64(i.bytes!)}').toList();
     _preview.setBackgroundColor(c.bg);
-    _preview.loadHtmlString(articleTemplate(title: _title.text.isEmpty ? '（タイトル）' : _title.text, bodyHtml: markdownToHtml(_body.text, urls), c: c, textScale: Settings.instance.textScale));
+    _preview.loadHtmlString(
+      articleTemplate(
+        title: _title.text.isEmpty ? '（タイトル）' : _title.text,
+        bodyHtml: markdownToHtml(_body.text, urls),
+        c: c,
+        textScale: Settings.instance.textScale,
+      ),
+    );
   }
 
   String _b64(Uint8List b) => base64Encode(b);
@@ -138,10 +147,17 @@ class _EditorPageState extends State<EditorPage> with SingleTickerProviderStateM
       builder: (ctx) => AlertDialog(
         icon: const TechMekuIcon(I.shield, size: 32, active: true),
         title: const Text('利用規約への同意', style: TextStyle(fontSize: 17)),
-        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('投稿する前に利用規約に同意してください。スパム・誹謗中傷・性的・違法なコンテンツは禁止です。違反した投稿は削除され、アカウントが停止されることがあります。'),
-          TextButton(onPressed: () => launchUrl(Uri.parse(AppConfig.termsUrl), mode: LaunchMode.externalApplication), child: const Text('利用規約を読む')),
-        ]),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('投稿する前に利用規約に同意してください。スパム・誹謗中傷・性的・違法なコンテンツは禁止です。違反した投稿は削除され、アカウントが停止されることがあります。'),
+            TextButton(
+              onPressed: () => launchUrl(Uri.parse(AppConfig.termsUrl), mode: LaunchMode.externalApplication),
+              child: const Text('利用規約を読む'),
+            ),
+          ],
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('キャンセル')),
           FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('同意する')),
@@ -173,7 +189,10 @@ class _EditorPageState extends State<EditorPage> with SingleTickerProviderStateM
         body: body,
         tags: _tags,
         keepImages: [for (final i in _images) ?i.key],
-        images: [for (final i in _images) if (i.bytes != null) UploadImage(i.bytes!, 'image/jpeg')],
+        images: [
+          for (final i in _images)
+            if (i.bytes != null) UploadImage(i.bytes!, 'image/jpeg'),
+        ],
       );
       await AuthService.instance.refresh();
       if (!mounted) return;
@@ -213,97 +232,136 @@ class _EditorPageState extends State<EditorPage> with SingleTickerProviderStateM
             padding: const EdgeInsets.only(right: 8),
             child: FilledButton.icon(
               onPressed: _saving ? null : _save,
-              icon: _saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : TechMekuIcon(I.check, size: 18, color: c.bg),
+              icon: _saving
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  : TechMekuIcon(I.check, size: 18, color: c.bg),
               label: Text(_editing ? '更新' : '投稿'),
             ),
           ),
         ],
       ),
-      body: Column(children: [
-        Container(
-          width: double.infinity,
-          color: c.card,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          child: Text(
-            _editing
-                ? '${remaining(widget.post!.expiresAt)}（編集しても期限は変わりません）'
-                : '自分 ${_mine ?? '-'}/5 ・ 全体 ${_global ?? '-'}/100 ・ 24時間で消えます（いいね・初回コメントで延長、最大7日）',
-            style: TextStyle(fontSize: 12, color: c.muted),
-          ),
-        ),
-        Expanded(
-          child: ListView(padding: const EdgeInsets.all(16), children: [
-            TextField(controller: _title, maxLength: 100, decoration: const InputDecoration(labelText: 'タイトル', border: OutlineInputBorder())),
-            const SizedBox(height: 8),
-            Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
-              for (final t in _tags) InputChip(label: Text('#$t'), onDeleted: () => setState(() => _tags.remove(t))),
-              if (_tags.length < 5)
-                SizedBox(
-                  width: 160,
-                  child: TextField(
-                    controller: _tagInput,
-                    decoration: InputDecoration(hintText: 'タグを追加（${_tags.length}/5）', isDense: true, prefixIcon: const Padding(padding: EdgeInsets.all(10), child: TechMekuIcon(I.tag, size: 16))),
-                    onSubmitted: (_) => _addTag(),
-                  ),
-                ),
-            ]),
-            const SizedBox(height: 12),
-            TabBar(
-              controller: _tabs,
-              labelColor: c.active,
-              indicatorColor: c.active,
-              tabs: const [
-                Tab(child: Row(mainAxisSize: MainAxisSize.min, children: [TechMekuIcon(I.code, size: 16), Text(' 編集')])),
-                Tab(child: Row(mainAxisSize: MainAxisSize.min, children: [TechMekuIcon(I.preview, size: 16), Text(' プレビュー')])),
-              ],
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              color: c.card,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: Text(
+                _editing
+                    ? '${remaining(widget.post!.expiresAt)}（編集しても期限は変わりません）'
+                    : '自分 ${_mine ?? '-'}/5 ・ 全体 ${_global ?? '-'}/100 ・ 24時間で消えます（いいね・初回コメントで延長、最大7日）',
+                style: TextStyle(fontSize: 12, color: c.muted),
+              ),
             ),
-            const SizedBox(height: 8),
-            if (_tabs.index == 0)
-              TextField(
-                controller: _body,
-                maxLength: 10000,
-                minLines: 12,
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(hintText: 'Markdown で書けます', border: OutlineInputBorder(), alignLabelWithHint: true),
-              )
-            else
-              SizedBox(height: 420, child: WebViewWidget(controller: _preview)),
-            const SizedBox(height: 12),
-            Row(children: [
-              Text('画像 ${_images.length}/3', style: const TextStyle(fontWeight: FontWeight.bold)),
-              const Spacer(),
-              TextButton.icon(onPressed: _pickImage, icon: const TechMekuIcon(I.upload, size: 18), label: const Text('画像を追加')),
-            ]),
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              for (var i = 0; i < _images.length; i++)
-                Stack(children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SizedBox(
-                      width: 96,
-                      height: 96,
-                      child: _images[i].bytes != null
-                          ? Image.memory(_images[i].bytes!, fit: BoxFit.cover)
-                          : Image.network(Api.instance.imageUrl(_images[i].key!), fit: BoxFit.cover, errorBuilder: (_, _, _) => const TechMekuIcon(I.image)),
-                    ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  TextField(
+                    controller: _title,
+                    maxLength: 100,
+                    decoration: const InputDecoration(labelText: 'タイトル', border: OutlineInputBorder()),
                   ),
-                  Positioned(left: 4, top: 4, child: Badge2('attachment:${i + 1}', color: Colors.white)),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: IconButton(
-                      icon: const TechMekuIcon(I.close, size: 18, color: Colors.white),
-                      onPressed: () => setState(() => _images.removeAt(i)),
-                    ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      for (final t in _tags) InputChip(label: Text('#$t'), onDeleted: () => setState(() => _tags.remove(t))),
+                      if (_tags.length < 5)
+                        SizedBox(
+                          width: 160,
+                          child: TextField(
+                            controller: _tagInput,
+                            decoration: InputDecoration(
+                              hintText: 'タグを追加（${_tags.length}/5）',
+                              isDense: true,
+                              prefixIcon: const Padding(padding: EdgeInsets.all(10), child: TechMekuIcon(I.tag, size: 16)),
+                            ),
+                            onSubmitted: (_) => _addTag(),
+                          ),
+                        ),
+                    ],
                   ),
-                ]),
-            ]),
-            const SizedBox(height: 8),
-            Text('本文に ![](attachment:1) のように書くと、その位置に画像が入ります。画像は長辺1280px・500KB以下に圧縮されます。', style: TextStyle(fontSize: 12, color: c.muted)),
-          ]),
+                  const SizedBox(height: 12),
+                  TabBar(
+                    controller: _tabs,
+                    labelColor: c.active,
+                    indicatorColor: c.active,
+                    tabs: const [
+                      Tab(
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [TechMekuIcon(I.code, size: 16), Text(' 編集')]),
+                      ),
+                      Tab(
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [TechMekuIcon(I.preview, size: 16), Text(' プレビュー')]),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (_tabs.index == 0)
+                    TextField(
+                      controller: _body,
+                      maxLength: 10000,
+                      minLines: 12,
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      decoration: const InputDecoration(hintText: 'Markdown で書けます', border: OutlineInputBorder(), alignLabelWithHint: true),
+                    )
+                  else
+                    SizedBox(height: 420, child: WebViewWidget(controller: _preview)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Text('画像 ${_images.length}/3', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const Spacer(),
+                      TextButton.icon(onPressed: _pickImage, icon: const TechMekuIcon(I.upload, size: 18), label: const Text('画像を追加')),
+                    ],
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (var i = 0; i < _images.length; i++)
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 96,
+                                height: 96,
+                                child: _images[i].bytes != null
+                                    ? Image.memory(_images[i].bytes!, fit: BoxFit.cover)
+                                    : Image.network(
+                                        Api.instance.imageUrl(_images[i].key!),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, _, _) => const TechMekuIcon(I.image),
+                                      ),
+                              ),
+                            ),
+                            Positioned(left: 4, top: 4, child: Badge2('attachment:${i + 1}', color: Colors.white)),
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: IconButton(
+                                icon: const TechMekuIcon(I.close, size: 18, color: Colors.white),
+                                onPressed: () => setState(() => _images.removeAt(i)),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text('本文に ![](attachment:1) のように書くと、その位置に画像が入ります。画像は長辺1280px・500KB以下に圧縮されます。', style: TextStyle(fontSize: 12, color: c.muted)),
+                ],
+              ),
+            ),
+          ],
         ),
-      ]),
+      ),
     );
   }
 }
