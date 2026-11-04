@@ -110,7 +110,7 @@ class ActionRail extends StatelessWidget {
       children: [
         for (final a in actions)
           Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: 24),
             child: SizedBox(
               width: 56,
               child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -216,7 +216,7 @@ class ArticleCard extends StatelessWidget {
         ),
       ),
       // アクションはタイトルの横の高さから並べる（親指が届きやすく、記事と対応が分かる位置）
-      Positioned(right: 8, top: 48, child: rail),
+      Positioned(right: 8, top: 124, child: rail),
     ]);
   }
 }
