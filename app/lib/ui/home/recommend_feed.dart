@@ -4,7 +4,9 @@ import '../../core/net.dart';
 import '../../core/settings.dart';
 import '../../core/techmeku_icon.dart';
 import '../../core/theme.dart';
+import '../../core/util.dart';
 import '../../models/models.dart';
+import '../../services/api.dart';
 import '../../services/sources.dart';
 import '../../services/stock.dart';
 import '../../services/tags.dart';
@@ -29,6 +31,8 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
   final Set<SourceType> _done = {};
   final Map<SourceType, String> _errors = {};
   String? _tag; // null = すべて
+  SourceType? _site; // null = 設定で ON のサイトすべて。app = TechMeku の投稿
+  final Map<String, Post> _posts = {}; // TechMeku の投稿（投稿ID → Post）
   bool _loading = false;
   bool _initial = true;
   int _gen = 0;
@@ -77,6 +81,7 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
     _cursor.clear();
     _done.clear();
     _errors.clear();
+    _posts.clear();
     _initial = true;
     _loading = false;
     _tagLabels = TagService.instance.current().map((t) => t.label).toList();
@@ -86,9 +91,13 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
     _loadMore();
   }
 
+  /// 読み込むサイト。チップで選んだサイトは、設定で OFF でも表示する
+  List<SourceType> get _sites => _site != null ? [_site!] : Settings.instance.enabledSites;
+
   Future<void> _loadMore() async {
     if (_loading || !NetStatus.instance.online) return;
-    final sites = Settings.instance.enabledSites.where((s) => !_done.contains(s)).toList();
+    if (_site == SourceType.app) return _loadPosts();
+    final sites = _sites.where((s) => !_done.contains(s)).toList();
     if (sites.isEmpty) {
       setState(() => _initial = false);
       return;
@@ -121,6 +130,33 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
     });
   }
 
+  /// #TechMeku：みんなの投稿を新しい順に。タグを選んでいればそのタグの投稿だけ
+  Future<void> _loadPosts() async {
+    if (_done.contains(SourceType.app)) return;
+    final gen = _gen;
+    setState(() => _loading = true);
+    try {
+      final list = await Api.instance.posts();
+      if (gen != _gen || !mounted) return;
+      final tag = _tag?.toLowerCase();
+      final hit = list.where((p) => tag == null || p.tags.any((t) => t.toLowerCase() == tag)).toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      for (final p in hit) {
+        _posts[p.id] = p;
+      }
+      _items.addAll(hit.map((p) => p.toSummary()));
+      _errors.remove(SourceType.app);
+    } on ApiException catch (e) {
+      _errors[SourceType.app] = e.message;
+    }
+    if (gen != _gen || !mounted) return;
+    setState(() {
+      _done.add(SourceType.app);
+      _loading = false;
+      _initial = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -133,13 +169,20 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
       SizedBox(
         height: 48,
         child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), children: [
-          _chip('すべて', _tag == null, () {
+          _chip('すべて', _tag == null && _site == null, () {
             _tag = null;
+            _site = null;
             _restart();
           }),
           for (final t in _tagLabels)
             _chip('#$t', _tag == t, () {
-              _tag = t;
+              _tag = _tag == t ? null : t;
+              _restart();
+            }),
+          // サイトで絞り込む（タグと組み合わせられる）
+          for (final s in SourceType.values)
+            _chip('#${s.label}', _site == s, () {
+              _site = _site == s ? null : s;
               _restart();
             }),
           ActionChip(
@@ -169,7 +212,7 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
             : _items.isEmpty
                 ? StatusCard(
                     icon: I.info,
-                    title: '記事が見つかりませんでした',
+                    title: _site == SourceType.app ? 'まだ投稿はありません' : '記事が見つかりませんでした',
                     action: OutlinedButton.icon(onPressed: _restart, icon: const TechMekuIcon(I.refresh, size: 18), label: const Text('再読み込み')),
                   )
                 : PageView.builder(
@@ -182,7 +225,7 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
                     },
                     itemBuilder: (context, i) {
                       if (i >= _items.length) {
-                        if (_loading || _done.length < Settings.instance.enabledSites.length) {
+                        if (_loading || _done.length < _sites.length) {
                           WidgetsBinding.instance.addPostFrameCallback((_) => _loadMore());
                           return const StatusCard(icon: I.loader, loading: true, title: '続きを読み込み中');
                         }
@@ -193,18 +236,20 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
                         );
                       }
                       final s = _items[i];
-                      final item = FeedItem(summary: s);
+                      final post = s.source == SourceType.app ? _posts[s.sourceKey] : null;
+                      final item = FeedItem(summary: s, post: post);
                       return StatefulBuilder(builder: (ctx, set) {
                         final saved = ArticleActions.saved(item);
                         return ArticleCard(
                           key: ValueKey(s.sourceKey),
                           summary: s,
                           badges: [
+                            if (post != null) Badge2(remaining(post.expiresAt), icon: I.clock, color: c.active),
                             if (saved) Badge2('保存済', icon: I.check_circle, color: c.active),
                             if (s.isPaidPartial) Badge2('有料記事（無料部分のみ）', color: c.warn),
                           ],
                           onOpen: () => ArticleActions.open(context, item),
-                          rail: ActionRail(ArticleActions.rail(ctx, item, refresh: () => set(() {}))),
+                          rail: ActionRail(ArticleActions.rail(ctx, item, refresh: () => set(() {}), onReported: () => setState(() => _items.remove(s)))),
                         );
                       });
                     },
