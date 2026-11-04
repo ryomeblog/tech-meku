@@ -18,7 +18,7 @@ class Shell extends StatefulWidget {
 
 class _ShellState extends State<Shell> {
   int _index = 0;
-  final _pages = const [HomePage(), MyPostsPage(), SizedBox(), ProfilePage(), SettingsPage()];
+  int _myPostsVisit = 0;
 
   void _select(int i) {
     if (i == 2) {
@@ -26,7 +26,11 @@ class _ShellState extends State<Shell> {
       Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EditorPage()));
       return;
     }
-    setState(() => _index = i);
+    setState(() {
+      // 自分の投稿は開くたびに読み込み直す（他の画面でのコメント・いいねを反映）
+      if (i == 1) _myPostsVisit++;
+      _index = i;
+    });
   }
 
   @override
@@ -38,7 +42,13 @@ class _ShellState extends State<Shell> {
           tooltip: label,
         );
     return Scaffold(
-      body: IndexedStack(index: _index, children: _pages),
+      body: IndexedStack(index: _index, children: [
+        const HomePage(),
+        MyPostsPage(key: ValueKey(_myPostsVisit)),
+        const SizedBox(),
+        const ProfilePage(),
+        const SettingsPage(),
+      ]),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: _select,
