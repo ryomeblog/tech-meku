@@ -28,6 +28,8 @@ class _StockFeedState extends State<StockFeed> with AutomaticKeepAliveClientMixi
   bool _loaded = false;
   int _index = 0;
   int _bytes = 0;
+  int _dbCount = 0; // 端末に実際にある件数（見出し用）
+  int _dbUnread = 0;
   bool _wasOnline = NetStatus.instance.online;
 
   @override
@@ -52,6 +54,7 @@ class _StockFeedState extends State<StockFeed> with AutomaticKeepAliveClientMixi
   Future<void> _reload() async {
     final items = await StockRepo.instance.feed(site: _site);
     _bytes = await StockRepo.instance.totalBytes();
+    _countFrom(items);
     if (!mounted) return;
     setState(() {
       _items = items;
@@ -63,15 +66,29 @@ class _StockFeedState extends State<StockFeed> with AutomaticKeepAliveClientMixi
     if (items.isNotEmpty) _onShown(0);
   }
 
-  /// セッション中は並びを固定し、新しく DL した記事は末尾に足す（6.3）
+  void _countFrom(List<StockArticle> all) {
+    _dbCount = all.length;
+    _dbUnread = all.where((a) => a.viewedAt == null && !_viewed.contains(a.id)).length;
+  }
+
+  /// セッション中は並びを固定し、新しく DL した記事は末尾に足す（6.3）。
+  /// 入れ替えで消えた記事は、まだ表示していない先のカードだけ外す（表示中と前のカードは位置がずれないよう残す）
   Future<void> _onRepo() async {
     if (!_loaded) return;
     final all = await StockRepo.instance.feed(site: _site);
     _bytes = await StockRepo.instance.totalBytes();
-    final have = _items.map((a) => a.id).toSet();
+    final alive = all.map((a) => a.id).toSet();
+    final kept = <StockArticle>[
+      for (var k = 0; k < _items.length; k++)
+        if (k <= _index || alive.contains(_items[k].id)) _items[k],
+    ];
+    final have = kept.map((a) => a.id).toSet();
     final added = all.where((a) => !have.contains(a.id)).toList()..sort((a, b) => a.downloadedAt.compareTo(b.downloadedAt));
     if (!mounted) return;
-    setState(() => _items = [..._items, ...added]);
+    setState(() {
+      _items = [...kept, ...added];
+      _countFrom(all);
+    });
   }
 
   void _onNet() {
@@ -136,7 +153,6 @@ class _StockFeedState extends State<StockFeed> with AutomaticKeepAliveClientMixi
   Widget _header(TmColors c) {
     final s = Settings.instance;
     final last = s.lastBatchAt;
-    final unread = _items.where((a) => a.viewedAt == null && !_viewed.contains(a.id)).length;
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
       padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
@@ -150,7 +166,7 @@ class _StockFeedState extends State<StockFeed> with AutomaticKeepAliveClientMixi
             ]),
             const SizedBox(height: 2),
             Text(
-              '${_items.length}件（未閲覧 $unread）・ ${formatBytes(_bytes)} / ${s.storageLimitGb} GB${last != null ? ' ・ 前回更新 ${formatClock(last)}' : ''}',
+              '$_dbCount件（未閲覧 $_dbUnread）・ ${formatBytes(_bytes)} / ${s.storageLimitGb} GB${last != null ? ' ・ 前回更新 ${formatClock(last)}' : ''}',
               style: TextStyle(fontSize: 12, color: _bytes > s.storageLimitBytes ? c.warn : c.muted),
             ),
           ]),
