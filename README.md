@@ -24,12 +24,38 @@ Qiita・Zenn・note の技術記事を端末に保存し、オフラインでも
 
 | 項目 | 内容 |
 |---|---|
-| 対象 OS | Android（Google Play で公開予定） |
+| 対象 OS | Android |
 | クライアント | Flutter |
 | サーバー | Cloudflare Workers + D1 + R2 + Cron Triggers + Access（無料枠のみで運用） |
 | 認証 | Google ログイン（メールアドレス・氏名は保存しません） |
 
 外部記事は端末から直接取得し、サーバーには保存しません。サーバーが扱うのは投稿・いいね・コメント・通報・認証だけです。
+
+## インフラ構成
+
+![TechMeku インフラ構成図](doc/infrastructure.drawio.png)
+
+| 場所 | 役割 |
+|---|---|
+| 利用者の Android 端末 | アプリ本体。Qiita・Zenn・note から記事を**端末が直接**取得し、本文・画像をアプリ専用ストレージ、ストック・キャッシュ・いいね一覧を SQLite、興味タグ・設定を shared_preferences に保存する。1日1回の自動DLは WorkManager |
+| 外部の記事サイト | Qiita API v2（公式・認証なし 60回/時）、Zenn・note の API（非公式）。サイトごとのアダプタで取得し、壊れたサイトだけ止められる |
+| Google | Google ログイン。アプリが受け取った ID トークンを Workers が公開鍵（JWKS）で検証する |
+| Cloudflare Workers（`techmeku-api`） | Hono 製の API。認証、みんなの投稿・いいね・コメント・通報、投稿画像の配信、管理ページ |
+| Cloudflare D1（`techmeku-db`） | ユーザー（Google の ID は HMAC でハッシュ化）・投稿・いいね・コメント・通報 |
+| Cloudflare R2（`techmeku-images`） | 投稿画像。非公開で、公開中の投稿の画像だけ Workers 経由で配信する |
+| Cron Triggers | 毎時、期限切れの投稿・コメント・画像を物理削除する |
+| Cloudflare Access | 管理ページ `/admin` を管理者だけに公開する（未設定の間は常に 403） |
+
+データの流れは次の4つです。
+
+1. **記事の取得**：端末 → 各サイト。取得した外部記事はサーバーに送りません
+2. **ログイン**：Google の ID トークンを Workers が検証し、セッション JWT（30日）を発行します
+3. **投稿系**：みんなの投稿（24時間、いいね・初回コメントで最大7日まで延長）、コメント、通報
+4. **管理**：Cloudflare Access で守った `/admin` から通報対応・アカウント停止
+
+メールアドレス・氏名・プロフィール画像は、サーバーにもアプリにも保存しません。
+
+構成図は draw.io のデータを埋め込んだ PNG です。[draw.io](https://app.diagrams.net/) で `doc/infrastructure.drawio.png` を開くと、そのまま編集できます。
 
 ## リポジトリ構成
 
@@ -51,6 +77,7 @@ Qiita・Zenn・note の技術記事を端末に保存し、オフラインでも
 └── doc/
     ├── design.md             # 設計書
     ├── wireframes.html       # 全画面のワイヤーフレーム
+    ├── infrastructure.drawio.png  # インフラ構成図（draw.io で編集可）
     ├── api-verification.md   # 外部 API の検証結果
     ├── terms.md / privacy.md # 利用規約・プライバシーポリシー（ドラフト）
     └── icon/                 # アイコン一覧と画面ごとの対応表
@@ -92,6 +119,7 @@ wrangler deploy                    # 本番へ
 
 - [設計書](doc/design.md)：仕様と実装設計。1〜3 章が確定した仕様、4〜9 章が実装設計です
 - [ワイヤーフレーム](doc/wireframes.html)：ブラウザで開いてください（アイコンは `app/assets/` を参照するため、クローンしてから開きます）
+- [インフラ構成図](doc/infrastructure.drawio.png)：draw.io で開くと編集できます
 - [外部 API の検証結果](doc/api-verification.md)
 - [アイコン対応表](doc/icon/ICON_USAGE.md)
 
