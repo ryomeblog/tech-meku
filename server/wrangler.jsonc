@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "techmeku-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-04",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "traces": { "enabled": true }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "techmeku-db",
+      "database_id": "8a14b328-17fd-477d-8567-d75a735449fc",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    { "binding": "IMAGES", "bucket_name": "techmeku-images" }
+  ],
+  "triggers": { "crons": ["0 * * * *"] },
+  "vars": {
+    // OAuth Web クライアントID（公開されてよい値）。ID トークンの aud 検証に使う
+    "GOOGLE_CLIENT_ID": "294650983462-ritiia32pi9q3j1vqesgedvu7tf3oljo.apps.googleusercontent.com",
+    // Cloudflare Access を設定したら値を入れる。空のままなら /admin は常に 403
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": ""
+  }
+  // シークレット（wrangler secret put で登録）: SERVER_SECRET / SESSION_SECRET / IP_SALT_SECRET
+}
