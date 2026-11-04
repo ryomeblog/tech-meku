@@ -32,11 +32,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     Tab tab(I icon, String label, int i) => Tab(
           child: AnimatedBuilder(
             animation: _tabs,
-            builder: (_, _) => Row(mainAxisSize: MainAxisSize.min, children: [
-              TechMekuIcon(icon, size: 18, active: _tabs.index == i),
-              const SizedBox(width: 4),
-              Text(label),
-            ]),
+            builder: (_, _) => FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                TechMekuIcon(icon, size: 18, active: _tabs.index == i),
+                const SizedBox(width: 4),
+                Text(label),
+              ]),
+            ),
           ),
         );
     return Scaffold(
@@ -50,6 +53,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             indicatorColor: c.active,
             dividerColor: c.line,
             labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            labelPadding: const EdgeInsets.symmetric(horizontal: 4),
             tabs: [tab(I.layers, 'おすすめ', 0), tab(I.bookmark, 'ストック', 1), tab(I.users, 'みんなの投稿', 2)],
           ),
           Expanded(
