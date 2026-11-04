@@ -1,0 +1,8 @@
+dependencies:
+  flutter_svg: ^2.0.0
+flutter:
+  assets:
+    - assets/icons/default/
+    - assets/icons/active/
+    - assets/icons/muted/
+    - assets/brand/

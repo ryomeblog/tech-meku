@@ -1,0 +1,436 @@
+[
+  {
+    "name": "home",
+    "usage": "下部ナビ：ホーム",
+    "default": "assets/icons/default/home.svg",
+    "active": "assets/icons/active/home.svg",
+    "muted": "assets/icons/muted/home.svg"
+  },
+  {
+    "name": "file_text",
+    "usage": "下部ナビ：自分の投稿",
+    "default": "assets/icons/default/file_text.svg",
+    "active": "assets/icons/active/file_text.svg",
+    "muted": "assets/icons/muted/file_text.svg"
+  },
+  {
+    "name": "plus_square",
+    "usage": "下部ナビ：新規投稿",
+    "default": "assets/icons/default/plus_square.svg",
+    "active": "assets/icons/active/plus_square.svg",
+    "muted": "assets/icons/muted/plus_square.svg"
+  },
+  {
+    "name": "user",
+    "usage": "下部ナビ：プロフィール",
+    "default": "assets/icons/default/user.svg",
+    "active": "assets/icons/active/user.svg",
+    "muted": "assets/icons/muted/user.svg"
+  },
+  {
+    "name": "settings",
+    "usage": "下部ナビ：設定",
+    "default": "assets/icons/default/settings.svg",
+    "active": "assets/icons/active/settings.svg",
+    "muted": "assets/icons/muted/settings.svg"
+  },
+  {
+    "name": "layers",
+    "usage": "おすすめタブ",
+    "default": "assets/icons/default/layers.svg",
+    "active": "assets/icons/active/layers.svg",
+    "muted": "assets/icons/muted/layers.svg"
+  },
+  {
+    "name": "bookmark",
+    "usage": "ストック/未保存",
+    "default": "assets/icons/default/bookmark.svg",
+    "active": "assets/icons/active/bookmark.svg",
+    "muted": "assets/icons/muted/bookmark.svg"
+  },
+  {
+    "name": "bookmark_filled",
+    "usage": "ストック/保存済",
+    "default": "assets/icons/default/bookmark_filled.svg",
+    "active": "assets/icons/active/bookmark_filled.svg",
+    "muted": "assets/icons/muted/bookmark_filled.svg"
+  },
+  {
+    "name": "users",
+    "usage": "みんなの投稿タブ",
+    "default": "assets/icons/default/users.svg",
+    "active": "assets/icons/active/users.svg",
+    "muted": "assets/icons/muted/users.svg"
+  },
+  {
+    "name": "heart",
+    "usage": "右側：いいね（未選択）",
+    "default": "assets/icons/default/heart.svg",
+    "active": "assets/icons/active/heart.svg",
+    "muted": "assets/icons/muted/heart.svg"
+  },
+  {
+    "name": "heart_filled",
+    "usage": "右側：いいね（選択済）",
+    "default": "assets/icons/default/heart_filled.svg",
+    "active": "assets/icons/active/heart_filled.svg",
+    "muted": "assets/icons/muted/heart_filled.svg"
+  },
+  {
+    "name": "comment",
+    "usage": "右側：コメント",
+    "default": "assets/icons/default/comment.svg",
+    "active": "assets/icons/active/comment.svg",
+    "muted": "assets/icons/muted/comment.svg"
+  },
+  {
+    "name": "download",
+    "usage": "右側：記事DL/一括DL",
+    "default": "assets/icons/default/download.svg",
+    "active": "assets/icons/active/download.svg",
+    "muted": "assets/icons/muted/download.svg"
+  },
+  {
+    "name": "check_circle",
+    "usage": "右側：保存済/完了",
+    "default": "assets/icons/default/check_circle.svg",
+    "active": "assets/icons/active/check_circle.svg",
+    "muted": "assets/icons/muted/check_circle.svg"
+  },
+  {
+    "name": "share",
+    "usage": "右側：共有",
+    "default": "assets/icons/default/share.svg",
+    "active": "assets/icons/active/share.svg",
+    "muted": "assets/icons/muted/share.svg"
+  },
+  {
+    "name": "external_link",
+    "usage": "右側：元記事",
+    "default": "assets/icons/default/external_link.svg",
+    "active": "assets/icons/active/external_link.svg",
+    "muted": "assets/icons/muted/external_link.svg"
+  },
+  {
+    "name": "flag",
+    "usage": "右側：通報",
+    "default": "assets/icons/default/flag.svg",
+    "active": "assets/icons/active/flag.svg",
+    "muted": "assets/icons/muted/flag.svg"
+  },
+  {
+    "name": "search",
+    "usage": "上部：検索",
+    "default": "assets/icons/default/search.svg",
+    "active": "assets/icons/active/search.svg",
+    "muted": "assets/icons/muted/search.svg"
+  },
+  {
+    "name": "more",
+    "usage": "共通：その他",
+    "default": "assets/icons/default/more.svg",
+    "active": "assets/icons/active/more.svg",
+    "muted": "assets/icons/muted/more.svg"
+  },
+  {
+    "name": "back",
+    "usage": "共通：戻る",
+    "default": "assets/icons/default/back.svg",
+    "active": "assets/icons/active/back.svg",
+    "muted": "assets/icons/muted/back.svg"
+  },
+  {
+    "name": "close",
+    "usage": "共通：閉じる",
+    "default": "assets/icons/default/close.svg",
+    "active": "assets/icons/active/close.svg",
+    "muted": "assets/icons/muted/close.svg"
+  },
+  {
+    "name": "check",
+    "usage": "共通：決定/適用",
+    "default": "assets/icons/default/check.svg",
+    "active": "assets/icons/active/check.svg",
+    "muted": "assets/icons/muted/check.svg"
+  },
+  {
+    "name": "edit",
+    "usage": "投稿管理：編集",
+    "default": "assets/icons/default/edit.svg",
+    "active": "assets/icons/active/edit.svg",
+    "muted": "assets/icons/muted/edit.svg"
+  },
+  {
+    "name": "trash",
+    "usage": "投稿管理：削除",
+    "default": "assets/icons/default/trash.svg",
+    "active": "assets/icons/active/trash.svg",
+    "muted": "assets/icons/muted/trash.svg"
+  },
+  {
+    "name": "filter",
+    "usage": "一覧：絞り込み",
+    "default": "assets/icons/default/filter.svg",
+    "active": "assets/icons/active/filter.svg",
+    "muted": "assets/icons/muted/filter.svg"
+  },
+  {
+    "name": "sliders",
+    "usage": "設定：表示・取得の条件",
+    "default": "assets/icons/default/sliders.svg",
+    "active": "assets/icons/active/sliders.svg",
+    "muted": "assets/icons/muted/sliders.svg"
+  },
+  {
+    "name": "calendar",
+    "usage": "記事：投稿日",
+    "default": "assets/icons/default/calendar.svg",
+    "active": "assets/icons/active/calendar.svg",
+    "muted": "assets/icons/muted/calendar.svg"
+  },
+  {
+    "name": "tag",
+    "usage": "記事：タグ",
+    "default": "assets/icons/default/tag.svg",
+    "active": "assets/icons/active/tag.svg",
+    "muted": "assets/icons/muted/tag.svg"
+  },
+  {
+    "name": "eye",
+    "usage": "記事：閲覧済",
+    "default": "assets/icons/default/eye.svg",
+    "active": "assets/icons/active/eye.svg",
+    "muted": "assets/icons/muted/eye.svg"
+  },
+  {
+    "name": "eye_off",
+    "usage": "記事：未閲覧",
+    "default": "assets/icons/default/eye_off.svg",
+    "active": "assets/icons/active/eye_off.svg",
+    "muted": "assets/icons/muted/eye_off.svg"
+  },
+  {
+    "name": "book_open",
+    "usage": "記事：全文既読",
+    "default": "assets/icons/default/book_open.svg",
+    "active": "assets/icons/active/book_open.svg",
+    "muted": "assets/icons/muted/book_open.svg"
+  },
+  {
+    "name": "library",
+    "usage": "プロフィール：自分のストック",
+    "default": "assets/icons/default/library.svg",
+    "active": "assets/icons/active/library.svg",
+    "muted": "assets/icons/muted/library.svg"
+  },
+  {
+    "name": "database",
+    "usage": "DLしたもの/保存容量",
+    "default": "assets/icons/default/database.svg",
+    "active": "assets/icons/active/database.svg",
+    "muted": "assets/icons/muted/database.svg"
+  },
+  {
+    "name": "refresh",
+    "usage": "自動DL/再試行",
+    "default": "assets/icons/default/refresh.svg",
+    "active": "assets/icons/active/refresh.svg",
+    "muted": "assets/icons/muted/refresh.svg"
+  },
+  {
+    "name": "wifi",
+    "usage": "オンライン",
+    "default": "assets/icons/default/wifi.svg",
+    "active": "assets/icons/active/wifi.svg",
+    "muted": "assets/icons/muted/wifi.svg"
+  },
+  {
+    "name": "wifi_off",
+    "usage": "オフライン",
+    "default": "assets/icons/default/wifi_off.svg",
+    "active": "assets/icons/active/wifi_off.svg",
+    "muted": "assets/icons/muted/wifi_off.svg"
+  },
+  {
+    "name": "loader",
+    "usage": "取得中",
+    "default": "assets/icons/default/loader.svg",
+    "active": "assets/icons/active/loader.svg",
+    "muted": "assets/icons/muted/loader.svg"
+  },
+  {
+    "name": "info",
+    "usage": "情報",
+    "default": "assets/icons/default/info.svg",
+    "active": "assets/icons/active/info.svg",
+    "muted": "assets/icons/muted/info.svg"
+  },
+  {
+    "name": "warning",
+    "usage": "警告/容量超過",
+    "default": "assets/icons/default/warning.svg",
+    "active": "assets/icons/active/warning.svg",
+    "muted": "assets/icons/muted/warning.svg"
+  },
+  {
+    "name": "clock",
+    "usage": "投稿：残り公開時間",
+    "default": "assets/icons/default/clock.svg",
+    "active": "assets/icons/active/clock.svg",
+    "muted": "assets/icons/muted/clock.svg"
+  },
+  {
+    "name": "plus",
+    "usage": "タグ追加/新規",
+    "default": "assets/icons/default/plus.svg",
+    "active": "assets/icons/active/plus.svg",
+    "muted": "assets/icons/muted/plus.svg"
+  },
+  {
+    "name": "minus",
+    "usage": "タグ解除",
+    "default": "assets/icons/default/minus.svg",
+    "active": "assets/icons/active/minus.svg",
+    "muted": "assets/icons/muted/minus.svg"
+  },
+  {
+    "name": "chevron_down",
+    "usage": "ドロップダウン",
+    "default": "assets/icons/default/chevron_down.svg",
+    "active": "assets/icons/active/chevron_down.svg",
+    "muted": "assets/icons/muted/chevron_down.svg"
+  },
+  {
+    "name": "chevron_right",
+    "usage": "一覧：詳細へ",
+    "default": "assets/icons/default/chevron_right.svg",
+    "active": "assets/icons/active/chevron_right.svg",
+    "muted": "assets/icons/muted/chevron_right.svg"
+  },
+  {
+    "name": "upload",
+    "usage": "投稿：画像添付",
+    "default": "assets/icons/default/upload.svg",
+    "active": "assets/icons/active/upload.svg",
+    "muted": "assets/icons/muted/upload.svg"
+  },
+  {
+    "name": "image",
+    "usage": "投稿：添付画像/記事画像",
+    "default": "assets/icons/default/image.svg",
+    "active": "assets/icons/active/image.svg",
+    "muted": "assets/icons/muted/image.svg"
+  },
+  {
+    "name": "code",
+    "usage": "投稿：Markdown/コード",
+    "default": "assets/icons/default/code.svg",
+    "active": "assets/icons/active/code.svg",
+    "muted": "assets/icons/muted/code.svg"
+  },
+  {
+    "name": "preview",
+    "usage": "投稿：プレビュー",
+    "default": "assets/icons/default/preview.svg",
+    "active": "assets/icons/active/preview.svg",
+    "muted": "assets/icons/muted/preview.svg"
+  },
+  {
+    "name": "send",
+    "usage": "コメント送信",
+    "default": "assets/icons/default/send.svg",
+    "active": "assets/icons/active/send.svg",
+    "muted": "assets/icons/muted/send.svg"
+  },
+  {
+    "name": "log_in",
+    "usage": "ログイン",
+    "default": "assets/icons/default/log_in.svg",
+    "active": "assets/icons/active/log_in.svg",
+    "muted": "assets/icons/muted/log_in.svg"
+  },
+  {
+    "name": "log_out",
+    "usage": "ログアウト",
+    "default": "assets/icons/default/log_out.svg",
+    "active": "assets/icons/active/log_out.svg",
+    "muted": "assets/icons/muted/log_out.svg"
+  },
+  {
+    "name": "shield",
+    "usage": "管理：認証/安全",
+    "default": "assets/icons/default/shield.svg",
+    "active": "assets/icons/active/shield.svg",
+    "muted": "assets/icons/muted/shield.svg"
+  },
+  {
+    "name": "user_x",
+    "usage": "管理：アカウント停止",
+    "default": "assets/icons/default/user_x.svg",
+    "active": "assets/icons/active/user_x.svg",
+    "muted": "assets/icons/muted/user_x.svg"
+  },
+  {
+    "name": "rotate_ccw",
+    "usage": "管理：復帰",
+    "default": "assets/icons/default/rotate_ccw.svg",
+    "active": "assets/icons/active/rotate_ccw.svg",
+    "muted": "assets/icons/muted/rotate_ccw.svg"
+  },
+  {
+    "name": "lock",
+    "usage": "管理/ログイン：保護",
+    "default": "assets/icons/default/lock.svg",
+    "active": "assets/icons/active/lock.svg",
+    "muted": "assets/icons/muted/lock.svg"
+  },
+  {
+    "name": "smartphone",
+    "usage": "端末保存の状態",
+    "default": "assets/icons/default/smartphone.svg",
+    "active": "assets/icons/active/smartphone.svg",
+    "muted": "assets/icons/muted/smartphone.svg"
+  },
+  {
+    "name": "cloud_off",
+    "usage": "オフライン状態カード",
+    "default": "assets/icons/default/cloud_off.svg",
+    "active": "assets/icons/active/cloud_off.svg",
+    "muted": "assets/icons/muted/cloud_off.svg"
+  },
+  {
+    "name": "alert_octagon",
+    "usage": "通報対応/エラー",
+    "default": "assets/icons/default/alert_octagon.svg",
+    "active": "assets/icons/active/alert_octagon.svg",
+    "muted": "assets/icons/muted/alert_octagon.svg"
+  },
+  {
+    "name": "help",
+    "usage": "ヘルプ/詳細説明",
+    "default": "assets/icons/default/help.svg",
+    "active": "assets/icons/active/help.svg",
+    "muted": "assets/icons/muted/help.svg"
+  },
+  {
+    "name": "list",
+    "usage": "投稿一覧/管理一覧",
+    "default": "assets/icons/default/list.svg",
+    "active": "assets/icons/active/list.svg",
+    "muted": "assets/icons/muted/list.svg"
+  },
+  {
+    "name": "arrow_up",
+    "usage": "上スワイプ案内",
+    "default": "assets/icons/default/arrow_up.svg",
+    "active": "assets/icons/active/arrow_up.svg",
+    "muted": "assets/icons/muted/arrow_up.svg"
+  },
+  {
+    "name": "file_check",
+    "usage": "投稿確認・保存済ファイル",
+    "default": "assets/icons/default/file_check.svg",
+    "active": "assets/icons/active/file_check.svg",
+    "muted": "assets/icons/muted/file_check.svg"
+  }
+]

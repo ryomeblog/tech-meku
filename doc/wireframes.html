@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechMeku ワイヤーフレーム</title>
+<style>
+:root{
+  --bg:#f4f4f2; --phone:#ffffff; --ink:#1d1d1f; --sub:#6b6b70; --line:#d4d4d8;
+  --box:#ececee; --box2:#e0e0e4; --accent:#0e8fb0; --brand:#0b1240; --warn:#c2410c; --ok:#15803d; --note:#fff7d6; --noteLine:#e6c94a; --new:#e0f2f7; --newLine:#5bbcd3;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121214; --phone:#1c1c1f; --ink:#ececf0; --sub:#9a9aa2; --line:#3a3a40;
+    --box:#26262b; --box2:#303036; --accent:#38d0ee; --brand:#9fb4ff; --warn:#fb923c; --ok:#4ade80; --note:#2e2a17; --noteLine:#7a6a20; --new:#10303a; --newLine:#2b7f93;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121214; --phone:#1c1c1f; --ink:#ececf0; --sub:#9a9aa2; --line:#3a3a40;
+  --box:#26262b; --box2:#303036; --accent:#38d0ee; --brand:#9fb4ff; --warn:#fb923c; --ok:#4ade80; --note:#2e2a17; --noteLine:#7a6a20; --new:#10303a; --newLine:#2b7f93;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:13px;line-height:1.5}
+header.top{padding:24px 16px 8px;max-width:1280px;margin:0 auto;display:flex;gap:14px;align-items:center}
+header.top img{width:56px;height:56px;border-radius:14px;flex:none}
+header.top h1{font-size:20px;margin:0 0 2px}
+header.top p{margin:0;color:var(--sub)}
+.legend{max-width:1280px;margin:4px auto 0;padding:0 16px;display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--sub)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+nav.toc{max-width:1280px;margin:10px auto 0;padding:0 16px;display:flex;flex-wrap:wrap;gap:6px}
+nav.toc a{font-size:12px;color:var(--accent);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+h2.group{max-width:1280px;margin:28px auto 0;padding:0 16px;font-size:15px}
+.grid{max-width:1280px;margin:0 auto;padding:12px 16px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
+.screen{display:flex;flex-direction:column;gap:8px;min-width:0}
+.screen h3{font-size:14px;margin:0}
+.screen h3 small{color:var(--sub);font-weight:normal;margin-left:6px}
+.phone{width:100%;max-width:320px;height:620px;background:var(--phone);border:2px solid var(--line);border-radius:28px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.status{height:22px;font-size:10px;color:var(--sub);display:flex;justify-content:space-between;padding:4px 16px 0;flex:none}
+.appbar{height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line);font-weight:600;flex:none}
+.appbar .sp{flex:1}
+.icon{width:22px;height:22px;border-radius:6px;background:var(--box2);display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex:none}
+.logo{display:flex;align-items:center;gap:6px;font-weight:800;letter-spacing:-.02em;color:var(--brand)}
+.logo img{width:20px;height:20px;border-radius:5px}
+.logo b{color:var(--accent)}
+.body{flex:1;overflow:hidden;position:relative;min-height:0}
+.pad{padding:12px}
+.bnav{height:52px;border-top:1px solid var(--line);display:flex;flex:none}
+.bnav div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--sub);gap:2px}
+.bnav div.on{color:var(--accent);font-weight:600}
+.bnav .plus{width:36px;height:26px;border-radius:8px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--ink)}
+.tabs{display:flex;justify-content:center;gap:16px;padding:6px 0;font-weight:600;flex:none}
+.tabs span{color:var(--sub);padding-bottom:4px}
+.tabs span.on{color:var(--ink);border-bottom:2px solid var(--accent)}
+.chips{display:flex;gap:6px;padding:0 12px 8px;flex-wrap:nowrap;overflow:hidden;flex:none}
+.chip{border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-size:11px;color:var(--sub);white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--phone);border-color:var(--ink)}
+.card{position:absolute;inset:0;padding:12px 60px 22px 12px;display:flex;flex-direction:column;gap:7px}
+.img{background:repeating-linear-gradient(45deg,var(--box),var(--box) 8px,var(--box2) 8px,var(--box2) 16px);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:11px;text-align:center}
+.meta{font-size:11px;color:var(--sub)}
+.title{font-size:16px;font-weight:700;line-height:1.35}
+.lines span{display:block;height:8px;background:var(--box2);border-radius:4px;margin:6px 0}
+.badge{display:inline-block;font-size:10px;border-radius:4px;padding:0 6px;border:1px solid var(--line);color:var(--sub);white-space:nowrap}
+.badge.ok{color:var(--ok);border-color:var(--ok)}
+.badge.warn{color:var(--warn);border-color:var(--warn)}
+.badge.acc{color:var(--accent);border-color:var(--accent)}
+.info{border:1px dashed var(--line);border-radius:8px;padding:6px 8px;font-size:11px;color:var(--sub)}
+.info b{color:var(--ink)}
+.rail{position:absolute;right:6px;bottom:22px;display:flex;flex-direction:column;gap:12px;align-items:center;width:50px}
+.rail div{display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--sub);gap:2px;text-align:center}
+.rail .b{width:44px;height:44px;border-radius:50%;background:var(--box2);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink)}
+.hint{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:10px;color:var(--sub)}
+.row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb{width:44px;height:44px;border-radius:8px;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ink);border-radius:8px;padding:6px 12px;font-weight:600;font-size:12px;white-space:nowrap}
+.btn.pri{background:var(--ink);color:var(--phone)}
+.btn.full{display:flex;width:100%}
+.btn.danger{border-color:var(--warn);color:var(--warn)}
+.field{border:1px solid var(--line);border-radius:8px;padding:8px;color:var(--sub);margin-bottom:8px}
+.lbl{font-size:11px;color:var(--sub);margin:8px 0 4px}
+.sec{font-size:11px;color:var(--sub);padding:10px 12px 3px;font-weight:600}
+.set{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.set span:last-child{color:var(--sub);font-size:12px;white-space:nowrap}
+.tog{width:30px;height:16px;border-radius:999px;background:var(--ink);position:relative;display:inline-block;vertical-align:middle}
+.tog::after{content:"";position:absolute;right:2px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--phone)}
+.tog.off{background:var(--box2)}
+.tog.off::after{left:2px;right:auto}
+.bar{height:6px;border-radius:3px;background:var(--box2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink)}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--phone);border-radius:16px 16px 0 0;border-top:1px solid var(--line)}
+.dialog{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-50%);background:var(--phone);border-radius:14px;padding:16px;border:1px solid var(--line)}
+.dialog h4{margin:0 0 8px;font-size:15px}
+.dialog .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.notes{background:var(--note);border:1px solid var(--noteLine);border-radius:8px;padding:8px 10px;font-size:12px;max-width:320px}
+.notes ul{margin:0;padding-left:16px}
+.notes.new{background:var(--new);border-color:var(--newLine)}
+.counter{display:flex;gap:8px}
+.counter div{flex:1;border:1px solid var(--line);border-radius:10px;padding:6px;text-align:center}
+.counter b{display:block;font-size:18px}
+.tagpick{display:flex;flex-wrap:wrap;gap:6px}
+.tagpick span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--sub)}
+.tagpick span.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+.endcard{position:absolute;inset:12px;border:2px dashed var(--line);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:16px}
+.endcard .big{font-size:30px}
+.desk{grid-column:1/-1}
+.desk .win{border:2px solid var(--line);border-radius:10px;background:var(--phone);overflow:hidden;max-width:960px}
+.desk table{width:100%;border-collapse:collapse;font-size:12px}
+.desk th,.desk td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left}
+.desk th{color:var(--sub);font-weight:600}
+.split{display:flex}
+.split aside{width:160px;border-right:1px solid var(--line);padding:10px}
+.split aside div{padding:6px 8px;border-radius:6px;color:var(--sub)}
+.split aside div.on{background:var(--box);color:var(--ink);font-weight:600}
+.split main{flex:1;padding:10px;overflow-x:auto}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+@media (max-width:420px){.split{flex-direction:column}.split aside{width:auto;border-right:0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:4px}}
+
+.ic{width:1.15em;height:1.15em;display:inline-block;vertical-align:-0.2em;color:currentColor;flex:none}
+.ic.ia{color:var(--accent)}
+/* default アイコン(#E5E7EB)はダーク背景用のため、ライトテーマでは暗くして視認性を確保 */
+.ic:not(.ia){filter:brightness(.35)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .ic:not(.ia){filter:none} }
+:root[data-theme="dark"] .ic:not(.ia){filter:none}
+/* 塗りボタン(.btn.pri)は背景がテーマで反転するため、アイコンも逆に調整 */
+.btn.pri .ic{filter:none}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.pri .ic{filter:brightness(.15)} }
+:root[data-theme="dark"] .btn.pri .ic{filter:brightness(.15)}
+.tabs .ic{margin-right:3px}
+.rail .b .ic{width:22px;height:22px}
+.bnav .ic{width:22px;height:22px}
+.btn .ic{margin-right:4px}
+.chip .ic,.badge .ic{margin-right:2px}
+.hint .ic{margin-right:3px}
+.ib{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.ib .ic{width:20px;height:20px}
+.endcard .big .ic{width:40px;height:40px}
+.avatar{width:52px;height:52px;border-radius:50%;flex:none;background:var(--box2);display:flex;align-items:center;justify-content:center}
+.avatar .ic{width:26px;height:26px}
+</style>
+</head>
+<body>
+<header class="top">
+  <img src="../assets/brand/techmeku_icon_192.png" alt="TechMeku アイコン">
+  <div>
+    <h1>TechMeku ワイヤーフレーム v2.2</h1>
+    <p>技術を、めくって発見する。 ／ design.md v2.2 と対応（画面IDは設計書3章）</p>
+  </div>
+</header>
+<div class="legend"><span>アイコン：TechMeku Icon Kit（SVG）。通常＝本文色、選択中＝active色（シアン）</span><span><i style="background:var(--note);border:1px solid var(--noteLine)"></i>実装メモ</span><span><i style="background:var(--new);border:1px solid var(--newLine)"></i>v2で追加・変更した点</span></div>
+<nav class="toc">
+  <a href="#s01">S01 おすすめ</a><a href="#s02">S02 ストック</a><a href="#s03">S03 みんなの投稿</a><a href="#s04">S04 全文</a><a href="#s05">S05 状態カード</a><a href="#s06">S06 一括DL</a>
+  <a href="#s07">S07 興味タグ</a><a href="#s08">S08 プロフィール</a><a href="#s09">S09 自分の投稿</a><a href="#s10">S10 いいね</a>
+  <a href="#s11">S11 エディタ</a><a href="#s12">S12 コメント</a><a href="#s13">S13 ログイン</a><a href="#s14">S14 設定</a><a href="#s15">S15 DLしたもの</a><a href="#s16">S16 ダイアログ</a><a href="#a01">A01 管理</a>
+</nav>
+
+<h2 class="group">ホーム（3タブ・上下スワイプ）</h2>
+<div class="grid">
+
+<!-- S01 -->
+<section class="screen" id="s01">
+  <h3>S01 おすすめ<small>起動時に開く・オンラインのみ</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar" style="border:0;height:36px"><span class="logo"><img src="../assets/brand/techmeku_icon_192.png" alt="">Tech<b>Meku</b></span></div>
+    <div class="tabs"><span class="on"><img class="ic ia" src="../assets/icons/active/layers.svg" alt="" aria-hidden="true">おすすめ</span><span><img class="ic" src="../assets/icons/default/bookmark.svg" alt="" aria-hidden="true">ストック</span><span><img class="ic" src="../assets/icons/default/users.svg" alt="" aria-hidden="true">みんなの投稿</span></div>
+    <div class="chips"><span class="chip on">すべて</span><span class="chip">#AI</span><span class="chip">#Flutter</span><span class="chip">#Go</span><span class="chip"><img class="ic" src="../assets/icons/default/tag.svg" alt="" aria-hidden="true">タグ</span></div>
+    <div class="body">
+      <div class="card">
+        <div class="meta">Zenn ・ @author ・ 35分前 ・ <span class="badge">未保存</span></div>
+        <div class="img" style="height:150px">サムネイル（元サイトの画像）</div>
+        <div class="title">記事タイトルが入ります。2行まで表示して、それ以上は省略…</div>
+        <div><span class="badge acc">#AI</span> <span class="badge">#LLM</span> <span class="meta"><img class="ic" src="../assets/icons/default/heart.svg" alt="" aria-hidden="true">12</span></div>
+        <div class="lines"><span></span><span></span><span style="width:70%"></span></div>
+        <div class="meta">タップで全文（その場で取得・保存しない）<img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></div>
+      </div>
+      <div class="rail">
+        <div><span class="b"><img class="ic" src="../assets/icons/default/heart.svg" alt="" aria-hidden="true"></span>いいね</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/download.svg" alt="" aria-hidden="true"></span>DL</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/share.svg" alt="" aria-hidden="true"></span>共有</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/external_link.svg" alt="" aria-hidden="true"></span>元記事</div>
+      </div>
+      <div class="hint"><img class="ic" src="../assets/icons/default/arrow_up.svg" alt="" aria-hidden="true">上にスワイプで次の記事</div>
+    </div>
+    <div class="bnav"><div class="on"><img class="ic ia" src="../assets/icons/active/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div><img class="ic" src="../assets/icons/default/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes new"><ul>
+    <li>興味タグの新着を各サイトから取得し、混ぜて投稿日時の新しい順</li>
+    <li>タグ未設定：「#AI＋ランダム2つ」（起動ごとに変わる）。チップ横に「tag タグ」</li>
+    <li>DL済みは「保存済」バッジ、DLボタンは check_circle（active色）</li>
+    <li>末尾から5枚目で続きを読み込む</li>
+    <li>起動時オフライン → 自動でストックを開く</li>
+  </ul></div>
+</section>
+
+<!-- S02 -->
+<section class="screen" id="s02">
+  <h3>S02 ストック<small>DL済み・オフラインOK</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>オフライン</span></div>
+    <div class="appbar" style="border:0;height:36px"><span class="logo"><img src="../assets/brand/techmeku_icon_192.png" alt="">Tech<b>Meku</b></span></div>
+    <div class="tabs"><span><img class="ic" src="../assets/icons/default/layers.svg" alt="" aria-hidden="true">おすすめ</span><span class="on"><img class="ic ia" src="../assets/icons/active/bookmark.svg" alt="" aria-hidden="true">ストック</span><span><img class="ic" src="../assets/icons/default/users.svg" alt="" aria-hidden="true">みんなの投稿</span></div>
+    <div class="chips"><span class="chip on">すべて</span><span class="chip">Qiita</span><span class="chip">Zenn</span><span class="chip">note</span><span class="chip">投稿</span></div>
+    <div class="body">
+      <div class="card">
+        <div class="info"><b>128件</b> ・ 2.46 / 3 GB ・ 前回更新 今日 7:00 ・ <span style="color:var(--accent)"><img class="ic ia" src="../assets/icons/active/download.svg" alt="" aria-hidden="true">一括DL</span></div>
+        <div class="img" style="height:130px">サムネイル（保存済み画像）</div>
+        <div class="meta">Qiita ・ @author ・ <img class="ic" src="../assets/icons/default/heart.svg" alt="" aria-hidden="true">1,240 ・ <span class="badge ok"><img class="ic" src="../assets/icons/default/smartphone.svg" alt="" aria-hidden="true">オフラインで読めます</span></div>
+        <div class="title">記事タイトルが入ります。2行まで表示…</div>
+        <div><span class="badge">#Flutter</span> <span class="badge acc">未閲覧</span></div>
+        <div class="lines"><span></span><span></span><span style="width:70%"></span></div>
+        <div class="meta">タップで全文を読む <img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></div>
+      </div>
+      <div class="rail">
+        <div><span class="b"><img class="ic" src="../assets/icons/default/heart.svg" alt="" aria-hidden="true"></span>いいね</div>
+        <div><span class="b"><img class="ic ia" src="../assets/icons/active/check_circle.svg" alt="" aria-hidden="true"></span>保存済</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/share.svg" alt="" aria-hidden="true"></span>共有</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/external_link.svg" alt="" aria-hidden="true"></span>元記事</div>
+      </div>
+      <div class="hint"><img class="ic" src="../assets/icons/default/arrow_up.svg" alt="" aria-hidden="true">未閲覧が残り5件で自動補充</div>
+    </div>
+    <div class="bnav"><div class="on"><img class="ic ia" src="../assets/icons/active/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div><img class="ic" src="../assets/icons/default/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes new"><ul>
+    <li>並び：未閲覧 → 閲覧済 → 既読、それぞれDLが新しい順</li>
+    <li>カード表示＝閲覧済、全文を開く＝既読</li>
+    <li>未閲覧の最後から5番目を表示したら一括取得（入れ替え）。モバイル通信でも実行</li>
+    <li>新しい記事は残りの未閲覧の後ろに追加。残り4件は見終わってからキャッシュへ</li>
+  </ul></div>
+</section>
+
+<!-- S03 -->
+<section class="screen" id="s03">
+  <h3>S03 みんなの投稿<small>新着順・最大100件</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar" style="border:0;height:36px"><span class="logo"><img src="../assets/brand/techmeku_icon_192.png" alt="">Tech<b>Meku</b></span></div>
+    <div class="tabs"><span><img class="ic" src="../assets/icons/default/layers.svg" alt="" aria-hidden="true">おすすめ</span><span><img class="ic" src="../assets/icons/default/bookmark.svg" alt="" aria-hidden="true">ストック</span><span class="on"><img class="ic ia" src="../assets/icons/active/users.svg" alt="" aria-hidden="true">みんなの投稿</span></div>
+    <div class="chips"><span class="chip">公開中 87 / 100</span></div>
+    <div class="body">
+      <div class="card">
+        <div class="meta">ユーザー4821 ・ 2時間前 ・ <span class="badge">編集済み</span></div>
+        <div class="title">投稿記事のタイトル</div>
+        <div><span class="badge">#個人開発</span></div>
+        <div class="img" style="height:120px">添付画像（1/3）</div>
+        <div class="lines"><span></span><span></span><span style="width:55%"></span></div>
+        <div class="info"><b><img class="ic" src="../assets/icons/default/clock.svg" alt="" aria-hidden="true">残り 21:34</b><br>いいね・初回コメントで延長（最大7日）</div>
+      </div>
+      <div class="rail">
+        <div><span class="b"><img class="ic ia" src="../assets/icons/active/heart_filled.svg" alt="" aria-hidden="true"></span>32</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/comment.svg" alt="" aria-hidden="true"></span>5</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/download.svg" alt="" aria-hidden="true"></span>DL</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/share.svg" alt="" aria-hidden="true"></span>共有</div>
+        <div><span class="b"><img class="ic" src="../assets/icons/default/flag.svg" alt="" aria-hidden="true"></span>通報</div>
+      </div>
+      <div class="hint"><img class="ic" src="../assets/icons/default/arrow_up.svg" alt="" aria-hidden="true">上にスワイプで次の投稿</div>
+    </div>
+    <div class="bnav"><div class="on"><img class="ic ia" src="../assets/icons/active/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div><img class="ic" src="../assets/icons/default/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes"><ul>
+    <li>自分の投稿：いいね無効、通報の位置は more（編集・削除）</li>
+    <li>未ログインでいいね・コメント → S13</li>
+    <li>オフライン時：「オフラインです。ストックをご覧ください」</li>
+    <li class="newli">v2：残り時間と延長ルールをカード内に表示</li>
+  </ul></div>
+</section>
+
+<!-- S04 -->
+<section class="screen" id="s04">
+  <h3>S04 記事全文<small>ローカル／オンライン取得</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="ib"><img class="ic" src="../assets/icons/default/back.svg" alt="" aria-hidden="true"></span><span class="sp">Zenn</span><span class="ib"><img class="ic" src="../assets/icons/default/sliders.svg" alt="" aria-hidden="true"></span></div>
+    <div class="body pad">
+      <div class="title">記事タイトルが入ります</div>
+      <div class="meta">@author ・ 2026/11/03 ・ <span class="badge warn">オンライン表示（未保存）</span></div>
+      <div class="lines"><span></span><span></span><span style="width:80%"></span></div>
+      <div class="img" style="height:110px;margin:8px 0">本文中の画像</div>
+      <div class="mono" style="background:var(--box);border-radius:8px;padding:8px">final x = await fetch();<br>print(x);</div>
+      <div class="lines"><span></span><span></span><span></span><span style="width:60%"></span></div>
+    </div>
+    <div class="bnav" style="justify-content:space-around">
+      <div><img class="ic" src="../assets/icons/default/heart.svg" alt="" aria-hidden="true"><span>いいね</span></div><div><img class="ic" src="../assets/icons/default/download.svg" alt="" aria-hidden="true"><span>DL</span></div><div><img class="ic" src="../assets/icons/default/share.svg" alt="" aria-hidden="true"><span>共有</span></div><div><img class="ic" src="../assets/icons/default/external_link.svg" alt="" aria-hidden="true"><span>元記事</span></div>
+    </div>
+  </div>
+  <div class="notes"><ul>
+    <li>ストックから：ローカルHTML、「端末に保存済み」バッジ</li>
+    <li>おすすめ・キャッシュ・いいね(Web)から：その場で取得して表示、保存しない。DLで保存</li>
+    <li>開いたら既読（ストックの記事のみ）</li>
+    <li>投稿記事は「元記事」の代わりに「コメント」</li>
+  </ul></div>
+</section>
+
+<!-- S05 -->
+<section class="screen" id="s05">
+  <h3>S05 ストック末尾の状態カード<small>取得中／オフライン</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>4G ▮▮▯</span></div>
+    <div class="appbar" style="border:0;height:36px"><span class="logo"><img src="../assets/brand/techmeku_icon_192.png" alt="">Tech<b>Meku</b></span></div>
+    <div class="tabs"><span><img class="ic" src="../assets/icons/default/layers.svg" alt="" aria-hidden="true">おすすめ</span><span class="on"><img class="ic ia" src="../assets/icons/active/bookmark.svg" alt="" aria-hidden="true">ストック</span><span><img class="ic" src="../assets/icons/default/users.svg" alt="" aria-hidden="true">みんなの投稿</span></div>
+    <div class="body">
+      <div class="endcard">
+        <div class="big"><img class="ic ia" src="../assets/icons/active/loader.svg" alt="" aria-hidden="true"></div>
+        <b>新しい記事を取得中</b>
+        <div style="width:80%"><div class="bar"><i style="width:33%"></i></div></div>
+        <div class="meta">30 / 90 ・ 届いた記事から順に、この後ろへ追加します</div>
+        <hr style="width:80%;border:0;border-top:1px solid var(--line)">
+        <div class="meta"><img class="ic" src="../assets/icons/default/cloud_off.svg" alt="" aria-hidden="true"><br><b>オフライン時</b><br>「オフラインです。接続すると取得します」<br>接続したら自動で開始</div>
+      </div>
+    </div>
+    <div class="bnav"><div class="on"><img class="ic ia" src="../assets/icons/active/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div><img class="ic" src="../assets/icons/default/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes new"><ul>
+    <li>未閲覧を最後までスワイプしたときに表示</li>
+    <li>新規0件だった場合は「新しい記事はありませんでした」＋30分は再実行しない</li>
+    <li>初回の自動補充時のみ、モバイル通信量の案内を一度出す（設計判断）</li>
+  </ul></div>
+</section>
+
+<!-- S06 -->
+<section class="screen" id="s06">
+  <h3>S06 一括DLの進捗・結果<small>入れ替え方式</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="ib"><img class="ic" src="../assets/icons/default/back.svg" alt="" aria-hidden="true"></span><span class="sp"><img class="ic" src="../assets/icons/default/download.svg" alt="" aria-hidden="true"> 一括ダウンロード</span></div>
+    <div class="body pad">
+      <div class="meta">タグ：#AI #Flutter #Go ・ 直近7日のいいね上位</div>
+      <div class="lbl">Qiita（最大20件）</div><div class="bar"><i style="width:100%"></i></div><div class="meta" style="color:var(--ok)"><img class="ic" src="../assets/icons/default/check_circle.svg" alt="" aria-hidden="true">完了 ・ 新規14件 / 既存6件</div>
+      <div class="lbl">Zenn（50件）</div><div class="bar"><i style="width:60%"></i></div><div class="meta"><img class="ic ia" src="../assets/icons/active/loader.svg" alt="" aria-hidden="true">30 / 50 ・ 画像を保存中…</div>
+      <div class="lbl">note（50件）</div><div class="bar"><i style="width:0%"></i></div><div class="meta" style="color:var(--warn)"><img class="ic" src="../assets/icons/default/warning.svg" alt="" aria-hidden="true">取得できませんでした（仕様変更の可能性）・<img class="ic" src="../assets/icons/default/refresh.svg" alt="" aria-hidden="true">再試行</div>
+      <div class="lbl">完了後の表示</div>
+      <div class="info"><b>新規 42件</b> ・ 残した 26件（新セット内・個別DL・いいね・投稿）<br>キャッシュへ 31件 ・ 削除 7件（未閲覧）</div>
+      <div class="lbl"><img class="ic" src="../assets/icons/default/database.svg" alt="" aria-hidden="true"> ストレージ</div><div class="bar"><i style="width:82%"></i></div><div class="meta">2.46 GB / 3 GB</div>
+      <div style="height:10px"></div>
+      <span class="btn full">バックグラウンドで続ける</span>
+      <div style="height:6px"></div>
+      <span class="btn full danger"><img class="ic" src="../assets/icons/default/close.svg" alt="" aria-hidden="true">中止（入れ替えは行わない）</span>
+    </div>
+  </div>
+  <div class="notes new"><ul>
+    <li>入れ替え前の確認はしない。完了後に件数を表示</li>
+    <li>失敗したサイトがあっても全部入れ替える</li>
+    <li>Qiita は設定に関わらず最大20件</li>
+  </ul></div>
+</section>
+</div>
+
+<h2 class="group">興味タグ・自分の投稿・プロフィール</h2>
+<div class="grid">
+
+<!-- S07 -->
+<section class="screen" id="s07">
+  <h3>S07 興味タグ選択<small>初回起動・設定・プロフィール</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="sp"><img class="ic" src="../assets/icons/default/tag.svg" alt="" aria-hidden="true"> 興味のある技術</span><span class="meta">スキップ</span></div>
+    <div class="body pad">
+      <div class="meta">選んだタグの新着がおすすめに流れ、一括DLもこのタグで絞ります。端末にだけ保存します。</div>
+      <div class="lbl">選択中 3 / 10</div>
+      <div class="tagpick">
+        <span class="on"><img class="ic ia" src="../assets/icons/active/check.svg" alt="" aria-hidden="true">AI</span><span class="on"><img class="ic ia" src="../assets/icons/active/check.svg" alt="" aria-hidden="true">Flutter</span><span class="on"><img class="ic ia" src="../assets/icons/active/check.svg" alt="" aria-hidden="true">Go</span><span>LLM</span><span>Python</span><span>TypeScript</span><span>React</span><span>Rust</span><span>AWS</span><span>Docker</span><span>セキュリティ</span><span>Godot</span><span>Unity</span><span>個人開発</span><span>初心者</span><span>…</span>
+      </div>
+      <div class="lbl">自由入力</div>
+      <div class="field"><img class="ic" src="../assets/icons/default/plus.svg" alt="" aria-hidden="true"> タグ名を入力（例：Hono）</div>
+      <div style="position:absolute;left:12px;right:12px;bottom:12px">
+        <span class="btn pri full"><img class="ic" src="../assets/icons/default/check.svg" alt="" aria-hidden="true">この設定で始める</span>
+        <div class="meta" style="text-align:center;margin-top:6px">未設定なら「AI＋ランダム2つ」を起動ごとに使います</div>
+      </div>
+    </div>
+  </div>
+  <div class="notes new"><ul>
+    <li>一覧のタグはサイトごとの名前を持つ（Zennは小文字のトピック名）</li>
+    <li>自由入力はQiita・noteにそのまま、Zennは小文字化</li>
+    <li>noteのハッシュタグ設定は廃止し、このタグを使う</li>
+  </ul></div>
+</section>
+
+<!-- S08 -->
+<section class="screen" id="s08">
+  <h3>S08 プロフィール：ストック<small>自分で保存した記事</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="body">
+      <div class="pad" style="display:flex;gap:10px;align-items:center">
+        <div class="avatar"><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"></div>
+        <div style="flex:1;min-width:0"><b>ユーザー4821</b> <span class="meta"><img class="ic" src="../assets/icons/default/edit.svg" alt="" aria-hidden="true"></span><div class="meta">#AI #Flutter #Go <span style="color:var(--accent)"><img class="ic ia" src="../assets/icons/active/tag.svg" alt="" aria-hidden="true">タグ</span></div></div>
+      </div>
+      <div class="tabs" style="border-bottom:1px solid var(--line)"><span class="on"><img class="ic ia" src="../assets/icons/active/library.svg" alt="" aria-hidden="true">ストック 12</span><span><img class="ic" src="../assets/icons/default/heart.svg" alt="" aria-hidden="true">いいね 24</span></div>
+      <div class="row"><span class="thumb img"></span><div class="t"><b>Cloudflare D1入門</b><span class="meta">Zenn ・ 1.1MB ・ <img class="ic ia" src="../assets/icons/active/heart_filled.svg" alt="" aria-hidden="true"></span></div></div>
+      <div class="row"><span class="thumb img"></span><div class="t"><b>Riverpodの設計パターン</b><span class="meta">Qiita ・ 2.0MB ・ <span class="badge acc">既読</span></span></div></div>
+      <div class="row"><span class="thumb img"></span><div class="t"><b>投稿記事のタイトル</b><span class="meta">投稿 ・ 0.4MB ・ <span class="badge">公開終了</span></span></div></div>
+      <div class="row"><span class="thumb img"></span><div class="t"><b>note 記事タイトル</b><span class="meta">note ・ 有料（無料部分のみ）</span></div></div>
+    </div>
+    <div class="bnav"><div><img class="ic" src="../assets/icons/default/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div class="on"><img class="ic ia" src="../assets/icons/active/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div><img class="ic" src="../assets/icons/default/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes new"><ul>
+    <li>プロフィールは「ストック」「いいね」の2タブ（v2.1）</li>
+    <li>個別DLした記事（投稿のDL含む）だけを表示。入れ替えでは消えない</li>
+    <li>タップ→S04、スワイプで削除</li>
+    <li>未ログイン：ヘッダーに「ログイン」。ストック・いいねは使える</li>
+  </ul></div>
+</section>
+
+<!-- S09 -->
+<section class="screen" id="s09">
+  <h3>S09 自分の投稿<small>ボトムナビから</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="sp"><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"> 自分の投稿</span></div>
+    <div class="body">
+      <div class="pad" style="padding-bottom:4px">
+        <div class="counter"><div><span class="meta">自分の公開中</span><b>3 / 5</b></div><div><span class="meta">全体の公開中</span><b>87 / 100</b></div></div>
+        <div style="height:8px"></div>
+        <span class="btn pri full"><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true">新しく投稿する</span>
+      </div>
+      <div class="row"><div class="t"><b>投稿タイトルA</b><span class="meta"><img class="ic" src="../assets/icons/default/heart.svg" alt="" aria-hidden="true">32 ・ <img class="ic" src="../assets/icons/default/comment.svg" alt="" aria-hidden="true">5 ・ <span class="badge warn"><img class="ic" src="../assets/icons/default/clock.svg" alt="" aria-hidden="true">残り 21:34</span></span></div><span class="meta"><img class="ic" src="../assets/icons/default/edit.svg" alt="" aria-hidden="true"> <img class="ic" src="../assets/icons/default/trash.svg" alt="" aria-hidden="true"></span></div>
+      <div class="row"><div class="t"><b>投稿タイトルB</b><span class="meta"><img class="ic" src="../assets/icons/default/heart.svg" alt="" aria-hidden="true">4 ・ <img class="ic" src="../assets/icons/default/comment.svg" alt="" aria-hidden="true">0 ・ <span class="badge warn"><img class="ic" src="../assets/icons/default/clock.svg" alt="" aria-hidden="true">残り 02:10</span></span></div><span class="meta"><img class="ic" src="../assets/icons/default/edit.svg" alt="" aria-hidden="true"> <img class="ic" src="../assets/icons/default/trash.svg" alt="" aria-hidden="true"></span></div>
+      <div class="row"><div class="t"><b>投稿タイトルC</b><span class="meta"><span class="badge">非表示（通報）</span> 残り 10:05</span></div><span class="meta"><img class="ic" src="../assets/icons/default/trash.svg" alt="" aria-hidden="true"></span></div>
+      <div class="pad meta">24時間で公開終了。いいね・初回コメントで延長（最大7日）</div>
+    </div>
+    <div class="bnav"><div><img class="ic" src="../assets/icons/default/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div class="on"><img class="ic ia" src="../assets/icons/active/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div><img class="ic" src="../assets/icons/default/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes new"><ul>
+    <li>v2.1：プロフィールのタブからボトムナビの独立画面に移動</li>
+    <li>公開中の投稿のみ。タップで全文、編集→S11、削除は確認ダイアログ</li>
+    <li>非表示（通報）でも期限までは枠を使う</li>
+    <li>未ログイン：「投稿を見るにはログイン」→S13</li>
+  </ul></div>
+</section>
+
+<!-- S10 -->
+<section class="screen" id="s10">
+  <h3>S10 プロフィール：いいね<small>参照先は表示時に解決</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="body">
+      <div class="pad" style="display:flex;gap:10px;align-items:center">
+        <div class="avatar"><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"></div>
+        <div><b>ユーザー4821</b><div class="meta">#AI #Flutter #Go</div></div>
+      </div>
+      <div class="tabs" style="border-bottom:1px solid var(--line)"><span><img class="ic" src="../assets/icons/default/library.svg" alt="" aria-hidden="true">ストック 12</span><span class="on"><img class="ic ia" src="../assets/icons/active/heart_filled.svg" alt="" aria-hidden="true">いいね 24</span></div>
+      <div class="row"><div class="t"><b>Cloudflare D1入門</b><span class="meta">Zenn ・ <span class="badge ok">端末に保存済み</span></span></div><span class="meta"><img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+      <div class="row"><div class="t"><b>Riverpodの設計パターン</b><span class="meta">Qiita ・ <span class="badge">Web</span></span></div><span class="meta"><img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+      <div class="row"><div class="t"><b>投稿記事のタイトル</b><span class="meta">投稿 ・ <span class="badge acc">公開中 残り14h</span></span></div><span class="meta"><img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+      <div class="row" style="opacity:.55"><div class="t"><b>消えた投稿記事</b><span class="meta">投稿 ・ <span class="badge">公開終了</span></span></div><span class="meta"><img class="ic" src="../assets/icons/default/clock.svg" alt="" aria-hidden="true"></span></div>
+    </div>
+    <div class="bnav"><div><img class="ic" src="../assets/icons/default/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div class="on"><img class="ic ia" src="../assets/icons/active/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div><img class="ic" src="../assets/icons/default/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes"><ul>
+    <li>保存済み→ローカル／Web→アプリ内でオンライン表示／投稿→サーバー参照</li>
+    <li>いいね済みの一括DL記事は入れ替えで消えない</li>
+    <li>スワイプで「DL」「いいね解除」</li>
+  </ul></div>
+</section>
+</div>
+
+<h2 class="group">投稿・コメント・ログイン</h2>
+<div class="grid">
+
+<!-- S11 -->
+<section class="screen" id="s11">
+  <h3>S11 投稿エディタ<small>＋新規投稿・編集</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="ib"><img class="ic" src="../assets/icons/default/close.svg" alt="" aria-hidden="true"></span><span class="sp"><img class="ic" src="../assets/icons/default/edit.svg" alt="" aria-hidden="true"> 新規投稿</span><span class="btn pri"><img class="ic" src="../assets/icons/default/check.svg" alt="" aria-hidden="true">投稿</span></div>
+    <div class="body pad">
+      <div class="info" style="margin-bottom:8px">自分 <b>3 / 5</b> ・ 全体 <b>87 / 100</b> ・ Markdown・10,000字・画像3枚・タグ5個</div>
+      <div class="field">タイトル（100字まで）</div>
+      <div class="field"><img class="ic" src="../assets/icons/default/tag.svg" alt="" aria-hidden="true"> タグ（最大5個）　#個人開発 <img class="ic" src="../assets/icons/default/close.svg" alt="" aria-hidden="true">　<img class="ic" src="../assets/icons/default/plus.svg" alt="" aria-hidden="true"></div>
+      <div class="tabs" style="justify-content:flex-start;padding:0 0 6px"><span class="on"><img class="ic ia" src="../assets/icons/active/code.svg" alt="" aria-hidden="true">編集</span><span><img class="ic" src="../assets/icons/default/preview.svg" alt="" aria-hidden="true">プレビュー</span></div>
+      <div class="field mono" style="height:130px">## 見出し<br>本文をMarkdownで…<br>![](attachment:1)</div>
+      <div class="meta" style="text-align:right">1,234 / 10,000</div>
+      <div class="lbl"><img class="ic" src="../assets/icons/default/image.svg" alt="" aria-hidden="true"> 画像（3枚まで・自動圧縮）</div>
+      <div style="display:flex;gap:8px"><span class="thumb img">1</span><span class="thumb img" style="opacity:.6"><img class="ic" src="../assets/icons/default/upload.svg" alt="" aria-hidden="true"></span><span class="thumb img" style="opacity:.6"><img class="ic" src="../assets/icons/default/upload.svg" alt="" aria-hidden="true"></span></div>
+      <div class="meta" style="margin-top:8px">24時間で公開終了。いいね・初回コメントで延長（最大7日）</div>
+    </div>
+  </div>
+  <div class="notes"><ul>
+    <li>5/5・100/100 のときは開いた時点でダイアログ（S16）</li>
+    <li>編集時は残り時間を表示（編集で期限は変わらない）</li>
+    <li>初回投稿時のみ利用規約の同意。未ログインならS13</li>
+  </ul></div>
+</section>
+
+<!-- S12 -->
+<section class="screen" id="s12">
+  <h3>S12 コメントシート<small>投稿記事のみ</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="body">
+      <div class="img" style="position:absolute;inset:0;border-radius:0">（背面：S03）</div>
+      <div class="scrim"></div>
+      <div class="sheet" style="height:78%">
+        <div class="appbar" style="border:0"><span class="sp"><img class="ic" src="../assets/icons/default/comment.svg" alt="" aria-hidden="true"> コメント 5 / 50</span><span class="ib"><img class="ic" src="../assets/icons/default/close.svg" alt="" aria-hidden="true"></span></div>
+        <div class="row"><div class="t"><b>ユーザーA</b><span class="meta">参考になりました！</span></div><span class="meta"><img class="ic" src="../assets/icons/default/more.svg" alt="" aria-hidden="true"></span></div>
+        <div class="row"><div class="t"><b>ユーザーB</b><span class="meta">ここの設定はどうしてますか？</span></div><span class="meta"><img class="ic" src="../assets/icons/default/more.svg" alt="" aria-hidden="true"></span></div>
+        <div class="row"><div class="t"><b>自分</b><span class="meta">コメント本文…</span></div><span class="meta"><img class="ic" src="../assets/icons/default/trash.svg" alt="" aria-hidden="true"></span></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;padding:10px;border-top:1px solid var(--line);display:flex;gap:8px">
+          <div class="field" style="flex:1;margin:0">コメントを書く（200字まで）</div><span class="btn pri"><img class="ic" src="../assets/icons/default/send.svg" alt="" aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ul>
+    <li>more：他人のコメント＝通報（flag）。投稿者には削除（trash）も表示</li>
+    <li>自分のコメントは削除のみ</li>
+    <li>50件到達で入力欄を無効化</li>
+  </ul></div>
+</section>
+
+<!-- S13 -->
+<section class="screen" id="s13">
+  <h3>S13 ログイン</h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="ib"><img class="ic" src="../assets/icons/default/back.svg" alt="" aria-hidden="true"></span><span class="sp">ログイン</span></div>
+    <div class="body pad" style="display:flex;flex-direction:column;justify-content:center;gap:12px">
+      <img src="../assets/brand/techmeku_icon_192.png" alt="TechMeku" style="width:84px;height:84px;border-radius:20px;margin:0 auto">
+      <div style="text-align:center;font-weight:700;font-size:15px">投稿・いいね・コメントには<br>ログインが必要です</div>
+      <span class="btn pri full"><img class="ic" src="../assets/icons/default/log_in.svg" alt="" aria-hidden="true">Googleでログイン</span>
+      <div class="notes" style="max-width:none"><img class="ic" src="../assets/icons/default/shield.svg" alt="" aria-hidden="true"> 保存するのは、GoogleのIDを変換した値（元に戻せない）とニックネームだけです。メールアドレス・氏名・写真は保存しません。</div>
+      <div class="meta" style="text-align:center">閲覧・ダウンロード・外部記事のいいねはログインなしで使えます</div>
+    </div>
+  </div>
+  <div class="notes"><ul>
+    <li>新規時はニックネーム確認（初期値「ユーザー1234」）</li>
+    <li>停止中／同一IPの作成上限はエラー表示（S16）</li>
+  </ul></div>
+</section>
+</div>
+
+<h2 class="group">設定・ダイアログ・管理</h2>
+<div class="grid">
+
+<!-- S14 -->
+<section class="screen" id="s14">
+  <h3>S14 設定</h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="sp"><img class="ic" src="../assets/icons/default/settings.svg" alt="" aria-hidden="true"> 設定</span></div>
+    <div class="body">
+      <div class="sec"><img class="ic" src="../assets/icons/default/tag.svg" alt="" aria-hidden="true"> 興味タグ</div>
+      <div class="set"><span>#AI #Flutter #Go</span><span>編集 <img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+      <div class="sec"><img class="ic" src="../assets/icons/default/download.svg" alt="" aria-hidden="true"> ダウンロード</div>
+      <div class="set"><span>取得件数（Qiitaは最大20）</span><span>50件 <img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+      <div class="set"><span>Qiita / Zenn / note</span><span><span class="tog"></span> <span class="tog"></span> <span class="tog"></span></span></div>
+      <div class="set"><span><img class="ic" src="../assets/icons/default/refresh.svg" alt="" aria-hidden="true"> 定期自動DL（1日1回）</span><span class="tog"></span></div>
+      <div class="set"><span><img class="ic" src="../assets/icons/default/wifi.svg" alt="" aria-hidden="true"> Wi-Fi時のみ（定期のみ）</span><span class="tog"></span></div>
+      <div class="sec"><img class="ic" src="../assets/icons/default/database.svg" alt="" aria-hidden="true"> ストレージ</div>
+      <div class="set"><span>使用量 ・ 上限</span><span>2.46 / 3 GB <img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+      <div class="set"><span>DLしたもの</span><span>140件 ・ キャッシュ31 <img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+      <div class="set"><span style="color:var(--warn)">ストックを全削除</span><span></span></div>
+      <div class="sec"><img class="ic" src="../assets/icons/default/sliders.svg" alt="" aria-hidden="true"> 表示</div>
+      <div class="set"><span>テーマ ・ 文字サイズ</span><span>システム ・ 標準 <img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+      <div class="sec"><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"> アカウント</div>
+      <div class="set"><span>ニックネーム</span><span>ユーザー4821 <img class="ic" src="../assets/icons/default/chevron_right.svg" alt="" aria-hidden="true"></span></div>
+    </div>
+    <div class="bnav"><div><img class="ic" src="../assets/icons/default/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div class="on"><img class="ic ia" src="../assets/icons/active/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes"><ul>
+    <li>続き：ログアウト（log_out）、アカウント削除（2段階確認）、利用規約、プライバシーポリシー、ライセンス、バージョン</li>
+    <li>容量上限：1/3/5/10GB。超えても警告のみ</li>
+    <li class="newli">v2：noteハッシュタグ設定を廃止→興味タグ</li>
+  </ul></div>
+</section>
+
+<!-- S15 -->
+<section class="screen" id="s15">
+  <h3>S15 DLしたもの<small>設定内・全件</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="ib"><img class="ic" src="../assets/icons/default/back.svg" alt="" aria-hidden="true"></span><span class="sp"><img class="ic" src="../assets/icons/default/database.svg" alt="" aria-hidden="true"> DLしたもの（140件）</span><span class="meta">選択</span></div>
+    <div class="chips" style="padding-top:8px"><span class="chip on">すべて</span><span class="chip">一括DL</span><span class="chip">個別DL</span><span class="chip">キャッシュ</span><span class="chip">Qiita</span></div>
+    <div class="body">
+      <div class="row"><span class="thumb img"></span><div class="t"><b>Flutterで○○する方法</b><span class="meta">Qiita ・ 一括DL ・ 3.2MB ・ <span class="badge acc">未閲覧</span></span></div></div>
+      <div class="row"><span class="thumb img"></span><div class="t"><b>Cloudflare D1入門</b><span class="meta">Zenn ・ 個別DL ・ 1.1MB ・ <img class="ic ia" src="../assets/icons/active/heart_filled.svg" alt="" aria-hidden="true"></span></div></div>
+      <div class="row" style="background:var(--box)"><span class="thumb img"></span><div class="t"><b>左スワイプで削除</b><span class="meta">note ・ 一括DL ・ 閲覧済</span></div><span class="btn danger"><img class="ic" src="../assets/icons/default/trash.svg" alt="" aria-hidden="true">削除</span></div>
+      <div class="row"><span class="thumb" style="display:flex;align-items:center;justify-content:center;border:1px dashed var(--line)"><img class="ic" src="../assets/icons/default/external_link.svg" alt="" aria-hidden="true"></span><div class="t"><b>前回の入れ替えで外れた記事</b><span class="meta">Qiita ・ <span class="badge warn">キャッシュ 残り18h</span> ・ URLのみ</span></div></div>
+      <div class="row"><span class="thumb" style="display:flex;align-items:center;justify-content:center;border:1px dashed var(--line)"><img class="ic" src="../assets/icons/default/external_link.svg" alt="" aria-hidden="true"></span><div class="t"><b>記事タイトル</b><span class="meta">Zenn ・ <span class="badge warn">キャッシュ 残り18h</span></span></div></div>
+    </div>
+    <div class="bnav"><div><img class="ic" src="../assets/icons/default/home.svg" alt="" aria-hidden="true"><span>ホーム</span></div><div><img class="ic" src="../assets/icons/default/file_text.svg" alt="" aria-hidden="true"><span>自分の投稿</span></div><div><img class="ic" src="../assets/icons/default/plus_square.svg" alt="" aria-hidden="true"><span>新規投稿</span></div><div><img class="ic" src="../assets/icons/default/user.svg" alt="" aria-hidden="true"><span>プロフィール</span></div><div class="on"><img class="ic ia" src="../assets/icons/active/settings.svg" alt="" aria-hidden="true"><span>設定</span></div></div>
+  </div>
+  <div class="notes new"><ul>
+    <li>v1のストック一覧をここへ移動。ストレージの記事＋キャッシュを全件表示</li>
+    <li>キャッシュ＝タイトル＋URLのみ。24hで削除、次の入れ替えでも全削除</li>
+    <li>キャッシュをタップ→オンライン取得して表示、DLで個別保存に戻せる</li>
+  </ul></div>
+</section>
+
+<!-- S16 -->
+<section class="screen" id="s16">
+  <h3>S16 ダイアログ例<small>全体100件満杯</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="body">
+      <div class="img" style="position:absolute;inset:0;border-radius:0">（背面：S11）</div>
+      <div class="scrim"></div>
+      <div class="dialog">
+        <h4><img class="ic ia" src="../assets/icons/active/info.svg" alt="" aria-hidden="true"> 現在、投稿は満員です</h4>
+        <div>公開中の投稿が上限（100件）に達しています。</div>
+        <div class="meta" style="margin-top:6px">次に空く予定：今日 21:34</div>
+        <div class="acts"><span class="btn pri">OK</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ul>
+    <li><b>自分の5件上限</b>：「公開中の投稿が5件あります。最短で 02:10 後に投稿できます」</li>
+    <li><img class="ic" src="../assets/icons/default/warning.svg" alt="" aria-hidden="true"><b>容量超過</b>：「上限3GBを超えました（3.12GB）。DLは続けます」［DLしたものへ］［OK］</li>
+    <li><img class="ic" src="../assets/icons/default/flag.svg" alt="" aria-hidden="true"><b>通報</b>：理由5択 → 送信後その投稿を自分から非表示</li>
+    <li><img class="ic" src="../assets/icons/default/alert_octagon.svg" alt="" aria-hidden="true"><b>停止中</b>／<b>作成上限</b>：エラー文を表示</li>
+    <li><b>Qiita制限</b>：「Qiitaは一時的に取得できません」（トースト）</li>
+  </ul></div>
+</section>
+
+<!-- A01 -->
+<section class="screen desk" id="a01">
+  <h3>A01 管理用Webページ<small>/admin（Cloudflare Access で保護）</small></h3>
+  <div class="win">
+    <div class="appbar"><span class="logo"><img src="../assets/brand/techmeku_icon_192.png" alt="">Tech<b>Meku</b>&nbsp;管理</span><span class="sp"></span><span class="meta"><img class="ic" src="../assets/icons/default/shield.svg" alt="" aria-hidden="true"> Accessでログイン中</span></div>
+    <div class="split">
+      <aside><div class="on"><img class="ic ia" src="../assets/icons/active/flag.svg" alt="" aria-hidden="true"> 通報一覧</div><div>非表示の投稿</div><div>非表示のコメント</div><div><img class="ic" src="../assets/icons/default/user_x.svg" alt="" aria-hidden="true"> 停止アカウント</div></aside>
+      <main>
+        <table>
+          <tr><th>種別</th><th>内容（冒頭）</th><th>投稿者</th><th>通報</th><th>状態</th><th>操作</th></tr>
+          <tr><td>投稿</td><td>タイトル…</td><td>ニックネーム</td><td>3（スパム2・その他1）</td><td><span class="badge warn">非表示</span></td><td><span class="btn"><img class="ic" src="../assets/icons/default/rotate_ccw.svg" alt="" aria-hidden="true">復帰</span> <span class="btn danger"><img class="ic" src="../assets/icons/default/trash.svg" alt="" aria-hidden="true">削除</span> <span class="btn danger"><img class="ic" src="../assets/icons/default/user_x.svg" alt="" aria-hidden="true">停止</span></td></tr>
+          <tr><td>コメント</td><td>コメント本文…</td><td>ニックネーム</td><td>1（誹謗中傷）</td><td><span class="badge">表示中</span></td><td><span class="btn danger"><img class="ic" src="../assets/icons/default/trash.svg" alt="" aria-hidden="true">削除</span> <span class="btn danger"><img class="ic" src="../assets/icons/default/user_x.svg" alt="" aria-hidden="true">停止</span></td></tr>
+        </table>
+      </main>
+    </div>
+  </div>
+  <div class="notes" style="max-width:960px"><ul>
+    <li>「停止」：bans に登録し、そのユーザーの投稿・コメントを削除。停止アカウント画面で解除可</li>
+    <li>「復帰」：status を active、report_count を 0 に戻す</li>
+  </ul></div>
+</section>
+</div>
+</body>
+</html>
