@@ -8,6 +8,7 @@ import 'package:techmeku/models/models.dart';
 import 'package:techmeku/services/html.dart';
 import 'package:techmeku/services/tags.dart';
 import 'package:techmeku/sources/article_source.dart';
+import 'package:techmeku/sources/gigazine.dart';
 import 'package:techmeku/sources/note.dart';
 import 'package:techmeku/sources/qiita.dart';
 import 'package:techmeku/sources/zenn.dart';
@@ -156,6 +157,56 @@ void main() {
       expect(e.title, 'A');
       await z.fetchContent(e);
       expect(calls, 1);
+    });
+  });
+
+  group('GIGAZINE', () {
+    final now = DateTime.now();
+    String rss(List<(String, DateTime, String)> items) => '''<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>GIGAZINE</title>
+${items.map((i) => '<item><title>${i.$1}</title><link>https://gigazine.net/news/${i.$1}/</link>'
+        '<description><![CDATA[${i.$1}の要約です。<p><b><a href="https://gigazine.net/news/x/">続きを読む...</a></b></p>]]></description>'
+        '<dc:subject>${i.$3}</dc:subject><dc:date>${i.$2.toIso8601String()}</dc:date></item>').join()}
+</channel></rss>''';
+    const page = '<html><body><div id="article"><div class="cntimage">'
+        '<time class="yeartime">2026年11月05日</time><span class="yeartime p-category">取材</span>'
+        '<h1 class="title">見出し</h1><p class="preface">本文です</p>'
+        '<img src="https://i.gzn.jp/a_m.jpg"><img data-src="https://i.gzn.jp/b_m.jpg" class="lazyload">'
+        '<script>x()</script></div><!-- google_ad_section_end --><p>広告など</p></div></body></html>';
+
+    test('RSS から新着を取り、タグは使わない。一括DLは直近7日を新しい順', () async {
+      final client = MockClient((req) async {
+        if (req.url.path == '/news/rss_2.0/') {
+          return http.Response.bytes(utf8.encode(rss([
+            ('old', now.subtract(const Duration(days: 9)), 'ゲーム,'),
+            ('new1', now.subtract(const Duration(hours: 2)), 'AI, ソフトウェア,'),
+            ('new2', now.subtract(const Duration(hours: 1)), 'セキュリティ,'),
+          ])), 200);
+        }
+        return http.Response.bytes(utf8.encode(page), 200);
+      });
+      final g = GigazineSource(SourceHttp(client));
+      final latest = await g.fetchLatest(tags: [tagFor('Flutter')]);
+      expect(latest.items.map((a) => a.title), ['new2', 'new1', 'old']);
+      expect(latest.nextCursor, isNull);
+      expect(latest.items[1].tags, ['AI', 'ソフトウェア']);
+      expect(latest.items[1].summary, 'new1の要約です。');
+      final popular = await g.fetchPopular(tags: const [], limit: 50);
+      expect(popular.map((a) => a.title), ['new2', 'new1']);
+      // 画像は記事ページから補い、本文は全文表示で再利用する
+      final e = await g.enrich(popular.first);
+      expect(e.thumbnailUrl, 'https://i.gzn.jp/a_m.jpg');
+      expect(g.needsEnrich(e), isFalse);
+    });
+
+    test('記事ページから本文だけを取り出す（見出し・日時・スクリプト・広告は除く）', () {
+      final body = extractGigazineBody(page);
+      expect(body, contains('本文です'));
+      expect(body, isNot(contains('見出し')));
+      expect(body, isNot(contains('2026年11月05日')));
+      expect(body, isNot(contains('<script')));
+      expect(body, isNot(contains('広告など')));
+      expect(extractImageUrls(body), ['https://i.gzn.jp/a_m.jpg', 'https://i.gzn.jp/b_m.jpg']);
     });
   });
 

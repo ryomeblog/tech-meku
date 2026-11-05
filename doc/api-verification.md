@@ -31,3 +31,17 @@
 | 有料記事 | `price > 0`。本文は無料部分のみ →「有料記事（無料部分のみ）」と表示 |
 | URL | `https://note.com/{user.urlname}/n/{key}` |
 | 注意 | `type` が `TextNote` 以外（画像・音声など）は除外。空のハッシュタグもある |
+
+## GIGAZINE（RSS ＋ 記事ページ）
+
+検証日：2026-11-05
+
+| 項目 | 結果 |
+|---|---|
+| 一覧 | `GET https://gigazine.net/news/rss_2.0/`。最新30件。`title`・`link`・`description`（要約＋「続きを読む」）・`dc:subject`（カテゴリ、カンマ区切り）・`dc:date` |
+| ページ送り | なし。一覧ページ（`/news/P40/` など）は robots.txt で禁止 |
+| タグ・人気 | タグはなくカテゴリだけ（AI、ソフトウェア、ハードウェア、セキュリティ、ゲーム、サイエンス、取材など）。いいね数のような指標はない |
+| 本文 | 記事ページ `https://gigazine.net/news/YYYYMMDD-slug/` の `<div class="cntimage">` から `<!-- google_ad_section_end` まで。先頭に `h1.title`・`time`・カテゴリがある |
+| 画像 | `i.gzn.jp`。先頭数枚は `src`、残りは遅延読み込みで `data-src` |
+| robots.txt | 全クローラー向けに `Crawl-delay: 100`。記事ページ（`/news/日付-名前/`）は禁止されていない |
+| 利用規約 | 記事の転載条件を定めたページは見つからない。コミュニティ利用規約では知的財産権は同社に帰属 |

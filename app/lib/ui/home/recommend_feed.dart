@@ -11,7 +11,6 @@ import '../../services/sources.dart';
 import '../../services/stock.dart';
 import '../../services/tags.dart';
 import '../../sources/article_source.dart';
-import '../../sources/zenn.dart';
 import '../common/actions.dart';
 import '../common/widgets.dart';
 import '../tags/tag_select_page.dart';
@@ -97,7 +96,10 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
   }
 
   /// 読み込むサイト。チップで選んだサイトは、設定で OFF でも表示する
-  List<SourceType> get _sites => _site != null ? [_site!] : Settings.instance.enabledSites;
+  /// GIGAZINE はタグがないため、タグのチップで絞っているときは出さない
+  List<SourceType> get _sites => _site != null
+      ? [_site!]
+      : Settings.instance.enabledSites.where((s) => _tag == null || s != SourceType.gigazine).toList();
 
   Future<void> _loadMore() async {
     if (_loading || !NetStatus.instance.online) return;
@@ -163,17 +165,19 @@ class _RecommendFeedState extends State<RecommendFeed> with AutomaticKeepAliveCl
     });
   }
 
-  /// Zenn のカードは一覧に冒頭がないので、表示中と次の2枚だけ詳細を取って補う
+  /// 一覧に冒頭や画像がないサイト（Zenn・GIGAZINE）は、表示中と次の2枚だけ詳細を取って補う
   void _enrichAround(int i) {
-    final zenn = Sources.instance.of(SourceType.zenn);
-    if (zenn is! ZennSource) return;
     for (var k = i; k < i + 3 && k < _items.length; k++) {
       final a = _items[k];
-      if (a.source != SourceType.zenn || (a.summary?.isNotEmpty ?? false) || !_enriching.add(a.sourceKey)) continue;
+      if (a.source == SourceType.app) continue;
+      final src = Sources.instance.of(a.source);
+      if (src is! Enrichable) continue;
+      final en = src as Enrichable;
+      if (!en.needsEnrich(a) || !_enriching.add('${a.source.name}|${a.sourceKey}')) continue;
       final gen = _gen;
-      zenn.enrich(a).then((e) {
+      en.enrich(a).then((e) {
         if (gen != _gen || !mounted) return;
-        final idx = _items.indexWhere((x) => x.source == SourceType.zenn && x.sourceKey == a.sourceKey);
+        final idx = _items.indexWhere((x) => x.source == a.source && x.sourceKey == a.sourceKey);
         if (idx >= 0) setState(() => _items[idx] = e);
       }).catchError((_) {});
     }

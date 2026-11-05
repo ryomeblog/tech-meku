@@ -6,7 +6,7 @@
 
 <p align="center"><b>技術を、めくって発見する。</b></p>
 
-Qiita・Zenn・note の技術記事を端末に保存し、オフラインでも上下スワイプで次々に読める Android アプリです（Flutter 製）。
+Qiita・Zenn・note・GIGAZINE の技術記事を端末に保存し、オフラインでも上下スワイプで次々に読める Android アプリです（Flutter 製）。
 興味タグに合った新着記事を「おすすめ」で流し読みでき、アプリ内で記事を投稿することもできます。投稿は 24 時間で消えますが、いいね・コメントで公開期間が延びます。
 
 > [!NOTE]
@@ -37,8 +37,8 @@ Qiita・Zenn・note の技術記事を端末に保存し、オフラインでも
 
 | 場所 | 役割 |
 |---|---|
-| 利用者の Android 端末 | アプリ本体。Qiita・Zenn・note から記事を**端末が直接**取得し、本文・画像をアプリ専用ストレージ、ストック・キャッシュ・いいね一覧を SQLite、興味タグ・設定を shared_preferences に保存する。1日1回の自動DLは WorkManager |
-| 外部の記事サイト | Qiita API v2（公式・認証なし 60回/時）、Zenn・note の API（非公式）。サイトごとのアダプタで取得し、壊れたサイトだけ止められる |
+| 利用者の Android 端末 | アプリ本体。Qiita・Zenn・note・GIGAZINE から記事を**端末が直接**取得し、本文・画像をアプリ専用ストレージ、ストック・キャッシュ・いいね一覧を SQLite、興味タグ・設定を shared_preferences に保存する。1日1回の自動DLは WorkManager |
+| 外部の記事サイト | Qiita API v2（公式・認証なし 60回/時）、Zenn・note の API（非公式）、GIGAZINE（RSS と記事ページ）。サイトごとのアダプタで取得し、壊れたサイトだけ止められる |
 | Google | Google ログイン。アプリが受け取った ID トークンを Workers が公開鍵（JWKS）で検証する |
 | Cloudflare Workers（`techmeku-api`） | Hono 製の API。認証、みんなの投稿・いいね・コメント・通報、投稿画像の配信、管理ページ |
 | Cloudflare D1（`techmeku-db`） | ユーザー（Google の ID は HMAC でハッシュ化）・投稿・いいね・コメント・通報 |

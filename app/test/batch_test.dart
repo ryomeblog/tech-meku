@@ -50,7 +50,7 @@ class FakeSource implements ArticleSource {
 }
 
 void main() {
-  late FakeSource qiita, zenn, note;
+  late FakeSource qiita, zenn, note, giga;
   final repo = StockRepo.instance;
   final runner = BatchRunner.instance;
 
@@ -74,7 +74,8 @@ void main() {
     qiita = FakeSource(SourceType.qiita);
     zenn = FakeSource(SourceType.zenn);
     note = FakeSource(SourceType.note);
-    for (final f in [qiita, zenn, note]) {
+    giga = FakeSource(SourceType.gigazine);
+    for (final f in [qiita, zenn, note, giga]) {
       Sources.instance.override(f.type, f);
       await Settings.instance.setFailures(f.type, 0);
     }
@@ -186,6 +187,7 @@ void main() {
 
     qiita.fail = true;
     note.fail = true;
+    giga.fail = true;
     await runner.run(BatchTrigger.manual);
     expect((await stock()).keys.toSet(), {'q2'});
   });

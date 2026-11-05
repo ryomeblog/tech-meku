@@ -4,6 +4,7 @@ import '../core/settings.dart';
 import '../core/util.dart';
 import '../models/models.dart';
 import '../sources/article_source.dart';
+import '../sources/gigazine.dart';
 import '../sources/note.dart';
 import '../sources/qiita.dart';
 import '../sources/zenn.dart';
@@ -17,6 +18,7 @@ class Sources {
     SourceType.qiita: QiitaSource(),
     SourceType.zenn: ZennSource(),
     SourceType.note: NoteSource(),
+    SourceType.gigazine: GigazineSource(),
   };
 
   ArticleSource of(SourceType t) => _all[t]!;

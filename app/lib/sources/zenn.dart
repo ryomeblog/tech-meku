@@ -9,7 +9,7 @@ import 'article_source.dart';
 /// - 人気：`order=weekly` が直近1週間の人気順
 /// - 本文：`/api/articles/{slug}` の `article.body_html`
 /// - 一覧に本文の冒頭はない → カードはタイトル・絵文字・いいね数・トピック
-class ZennSource implements ArticleSource {
+class ZennSource implements ArticleSource, Enrichable {
   ZennSource([SourceHttp? http]) : _http = http ?? SourceHttp();
   final SourceHttp _http;
 
@@ -61,6 +61,10 @@ class ZennSource implements ArticleSource {
 
   /// 一覧には本文の冒頭がないため、詳細を取って冒頭と最初の画像を補う。
   /// 取った本文は extra['html'] に入れ、全文表示で再取得しない
+  @override
+  bool needsEnrich(ArticleSummary s) => s.summary == null || s.summary!.isEmpty;
+
+  @override
   Future<ArticleSummary> enrich(ArticleSummary s) async {
     final c = await fetchContent(s);
     final images = c.imageUrls;

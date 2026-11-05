@@ -4,12 +4,13 @@ enum SourceType {
   qiita('Qiita'),
   zenn('Zenn'),
   note('note'),
+  gigazine('GIGAZINE'),
   app('TechMeku');
 
   const SourceType(this.label);
   final String label;
 
-  static const external = [qiita, zenn, note];
+  static const external = [qiita, zenn, note, gigazine];
   static SourceType parse(String s) => values.firstWhere((v) => v.name == s, orElse: () => app);
 }
 

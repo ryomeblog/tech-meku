@@ -23,7 +23,7 @@ class Tag {
         SourceType.qiita => qiita,
         SourceType.zenn => zenn,
         SourceType.note => note,
-        SourceType.app => label,
+        SourceType.gigazine || SourceType.app => label,
       };
 }
 
@@ -49,12 +49,33 @@ abstract class ArticleSource {
   Future<ArticleContent> fetchContent(ArticleSummary summary);
 }
 
+/// 一覧に冒頭や画像がないサイト用：詳細を取ってカードの情報を補う
+abstract class Enrichable {
+  /// この記事は補う必要があるか
+  bool needsEnrich(ArticleSummary s);
+  Future<ArticleSummary> enrich(ArticleSummary s);
+}
+
 /// 共通の HTTP ヘルパ
 class SourceHttp {
   SourceHttp([http.Client? client]) : _client = client ?? http.Client();
   final http.Client _client;
 
   static const _headers = {'User-Agent': 'TechMeku/0.1 (Android)', 'Accept': 'application/json'};
+
+  /// RSS・HTML などをテキストで取得する
+  Future<String> getText(Uri uri) async {
+    final http.Response r;
+    try {
+      r = await _client.get(uri, headers: {'User-Agent': _headers['User-Agent']!}).timeout(const Duration(seconds: 20));
+    } catch (e) {
+      throw SourceException('通信に失敗しました');
+    }
+    if (r.statusCode == 429) throw SourceException('レート制限中です', rateLimited: true);
+    if (r.statusCode == 404) throw SourceException('記事が見つかりません');
+    if (r.statusCode >= 400) throw SourceException('取得に失敗しました（${r.statusCode}）');
+    return utf8.decode(r.bodyBytes, allowMalformed: true);
+  }
 
   Future<dynamic> getJson(Uri uri) async {
     final http.Response r;
