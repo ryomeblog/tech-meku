@@ -12,6 +12,7 @@ import '../../services/stock.dart';
 import '../auth/login_page.dart';
 import '../common/actions.dart';
 import '../common/widgets.dart';
+import '../stock/url_save_sheet.dart';
 import '../tags/tag_select_page.dart';
 
 /// プロフィール：ストック（S08）／いいね（S10）
@@ -94,12 +95,26 @@ class _MyStock extends StatelessWidget {
         builder: (context, snap) {
           final list = snap.data;
           if (list == null) return const Center(child: CircularProgressIndicator());
-          if (list.isEmpty) return const EmptyState(icon: I.bookmark, text: 'カードの「DL」で保存した記事がここに並びます');
+          // 一覧の先頭に「＋URLから保存」（v2.4）
+          final addRow = ListTile(
+            leading: TechMekuIcon(I.plus, active: true),
+            title: Text('URLから保存', style: TextStyle(color: c.active, fontWeight: FontWeight.bold)),
+            trailing: Text('Qiita・Zenn・note・GIGAZINE', style: TextStyle(fontSize: 11, color: c.muted)),
+            onTap: () => UrlSaveSheet.show(context),
+          );
+          if (list.isEmpty) {
+            return ListView(children: [
+              addRow,
+              Divider(height: 1, color: c.line),
+              const SizedBox(height: 240, child: EmptyState(icon: I.bookmark, text: 'カードの「DL」や URL から保存した記事がここに並びます')),
+            ]);
+          }
           return ListView.separated(
-            itemCount: list.length,
+            itemCount: list.length + 1,
             separatorBuilder: (_, _) => Divider(height: 1, color: c.line),
-            itemBuilder: (_, i) {
-              final a = list[i];
+            itemBuilder: (_, k) {
+              if (k == 0) return addRow;
+              final a = list[k - 1];
               return ListTile(
                 leading: TechMekuIcon(a.source == SourceType.app ? I.file_text : I.bookmark_filled, active: true),
                 title: Text(a.title, maxLines: 2, overflow: TextOverflow.ellipsis),

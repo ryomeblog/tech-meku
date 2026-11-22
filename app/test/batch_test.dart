@@ -11,6 +11,7 @@ import 'package:techmeku/models/models.dart';
 import 'package:techmeku/services/batch.dart';
 import 'package:techmeku/services/sources.dart';
 import 'package:techmeku/services/stock.dart';
+import 'package:techmeku/services/url_save.dart';
 import 'package:techmeku/sources/article_source.dart';
 
 class _FakePaths extends PathProviderPlatform with MockPlatformInterfaceMixin {
@@ -47,6 +48,13 @@ class FakeSource implements ArticleSource {
 
   @override
   Future<Page<ArticleSummary>> fetchLatest({required List<Tag> tags, String? cursor}) async => Page([], null);
+
+  /// テスト用：https://{サイト名}/{key} を自サイトの記事とみなす
+  @override
+  ArticleRef? matchUrl(Uri url) => url.host == type.name ? ArticleRef(type, url.pathSegments.last, url.toString()) : null;
+
+  @override
+  Future<ArticleSummary> fetchByRef(ArticleRef ref) async => s(ref.id);
 }
 
 void main() {
@@ -190,6 +198,54 @@ void main() {
     giga.fail = true;
     await runner.run(BatchTrigger.manual);
     expect((await stock()).keys.toSet(), {'q2'});
+  });
+
+  group('URLから保存（v2.4）', () {
+    test('保存した記事は個別DL扱いで、入れ替えで消えない', () async {
+      final ref = UrlSave.resolve('https://qiita/u1')!;
+      final (s, existing) = await UrlSave.preview(ref);
+      expect(existing, isNull);
+      final a = await UrlSave.save(s);
+      expect(a.origin, 'manual');
+      qiita.popular = ['other'];
+      await runner.run(BatchTrigger.manual);
+      expect((await stock()).containsKey('u1'), isTrue);
+    });
+
+    test('一括DLで保存済みの記事は、再DLせずに manual へ切り替わる', () async {
+      qiita.popular = ['b1'];
+      await runner.run(BatchTrigger.manual);
+      final calls = qiita.contentCalls;
+      final (s, existing) = await UrlSave.preview(UrlSave.resolve('https://qiita/b1')!);
+      expect(existing!.origin, 'batch');
+      final a = await UrlSave.save(s);
+      expect(a.id, existing.id);
+      expect(a.origin, 'manual');
+      expect(qiita.contentCalls, calls);
+    });
+
+    test('キャッシュにある記事はストックに戻り、キャッシュから消える', () async {
+      qiita.popular = ['c1'];
+      await runner.run(BatchTrigger.manual);
+      await repo.markViewed((await stock())['c1']!.id);
+      qiita.popular = ['c2'];
+      await runner.run(BatchTrigger.manual);
+      expect(await cache(), ['c1']);
+      final (s, existing) = await UrlSave.preview(UrlSave.resolve('https://qiita/c1')!);
+      expect(existing, isNull);
+      await UrlSave.save(s);
+      expect((await stock())['c1']!.origin, 'manual');
+      expect(await cache(), isEmpty);
+    });
+
+    test('設定で OFF にしたサイトでも保存できる', () async {
+      await Settings.instance.setSiteEnabled(SourceType.zenn, false);
+      final ref = UrlSave.resolve('共有テキスト https://zenn/z9 #タグ')!;
+      expect(ref.source, SourceType.zenn);
+      await UrlSave.save((await UrlSave.preview(ref)).$1);
+      expect((await stock()).containsKey('z9'), isTrue);
+      await Settings.instance.setSiteEnabled(SourceType.zenn, true);
+    });
   });
 
   test('ストックの並び：未閲覧 → 閲覧済 → 既読', () async {

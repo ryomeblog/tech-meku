@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../core/util.dart';
 import '../models/models.dart';
 
 /// 興味タグ。サイトごとのタグ名を持つ（doc/design.md 5.2）
@@ -28,9 +29,12 @@ class Tag {
 }
 
 class SourceException implements Exception {
-  SourceException(this.message, {this.rateLimited = false});
+  SourceException(this.message, {this.rateLimited = false, this.notFound = false});
   final String message;
   final bool rateLimited;
+
+  /// 記事が存在しない（404）。サイトの不調ではないので連続失敗に数えない
+  final bool notFound;
   @override
   String toString() => message;
 }
@@ -47,6 +51,12 @@ abstract class ArticleSource {
 
   /// 本文HTMLと画像URL一覧
   Future<ArticleContent> fetchContent(ArticleSummary summary);
+
+  /// v2.4：記事 URL（正規化済み）がこのサイトのものなら記事を特定する情報を返す。違えば null
+  ArticleRef? matchUrl(Uri url);
+
+  /// v2.4：URL から記事 1 件の要約を取得（プレビュー用）。本文は extra['html'] に入れて保存時に再利用する
+  Future<ArticleSummary> fetchByRef(ArticleRef ref);
 }
 
 /// 一覧に冒頭や画像がないサイト用：詳細を取ってカードの情報を補う
@@ -72,7 +82,7 @@ class SourceHttp {
       throw SourceException('通信に失敗しました');
     }
     if (r.statusCode == 429) throw SourceException('レート制限中です', rateLimited: true);
-    if (r.statusCode == 404) throw SourceException('記事が見つかりません');
+    if (r.statusCode == 404) throw SourceException('記事が見つかりません', notFound: true);
     if (r.statusCode >= 400) throw SourceException('取得に失敗しました（${r.statusCode}）');
     return utf8.decode(r.bodyBytes, allowMalformed: true);
   }
@@ -85,7 +95,7 @@ class SourceHttp {
       throw SourceException('通信に失敗しました');
     }
     if (r.statusCode == 429) throw SourceException('レート制限中です', rateLimited: true);
-    if (r.statusCode == 404) throw SourceException('記事が見つかりません');
+    if (r.statusCode == 404) throw SourceException('記事が見つかりません', notFound: true);
     if (r.statusCode >= 400) throw SourceException('取得に失敗しました（${r.statusCode}）');
     try {
       return jsonDecode(utf8.decode(r.bodyBytes));
@@ -118,6 +128,22 @@ String plainExcerpt(String text, [int n = 200]) {
       .trim();
   final runes = s.runes.toList();
   return runes.length <= n ? s : '${String.fromCharCodes(runes.take(n))}…';
+}
+
+/// 共有テキストなどから最初の http(s) URL を取り出す（v2.4）
+String? extractFirstUrl(String text) {
+  final m = RegExp(r'''https?://[^\s<>"'「」（）()【】]+''').firstMatch(text);
+  if (m == null) return null;
+  // 文末の句読点・括弧は URL に含めない
+  return m.group(0)!.replaceAll(RegExp(r'[、。,.!?！？）)\]」』]+$'), '');
+}
+
+/// 記事 URL の判定用に正規化する：https に統一し、クエリ・フラグメント・末尾スラッシュを除く（6.5）
+Uri? articleUri(String text) {
+  final raw = extractFirstUrl(text.trim()) ?? text.trim();
+  final u = Uri.tryParse(raw);
+  if (u == null || u.host.isEmpty || (u.scheme != 'http' && u.scheme != 'https')) return null;
+  return Uri.parse(normalizeUrl(u.replace(scheme: 'https').toString()));
 }
 
 int? parseTime(Object? s) => s is String ? DateTime.tryParse(s)?.millisecondsSinceEpoch : null;

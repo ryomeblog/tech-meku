@@ -10,6 +10,7 @@ import '../../services/batch.dart';
 import '../../services/stock.dart';
 import '../common/actions.dart';
 import '../common/widgets.dart';
+import '../stock/url_save_sheet.dart';
 import 'batch_sheet.dart';
 
 /// ホーム：ストック（S02）
@@ -171,6 +172,7 @@ class _StockFeedState extends State<StockFeed> with AutomaticKeepAliveClientMixi
             ),
           ]),
         ),
+        IconButton(icon: TechMekuIcon(I.plus, active: true, size: 22), tooltip: 'URLから保存', onPressed: () => UrlSaveSheet.show(context)),
         IconButton(icon: TechMekuIcon(I.filter, active: _site != null, size: 22), tooltip: 'サイトで絞り込み', onPressed: _pickSite),
         ListenableBuilder(
           listenable: BatchRunner.instance,

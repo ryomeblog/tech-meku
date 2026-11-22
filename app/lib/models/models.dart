@@ -67,6 +67,18 @@ class ArticleSummary {
       );
 }
 
+/// URL から特定した記事（v2.4。設計書 5.10）
+class ArticleRef {
+  const ArticleRef(this.source, this.id, this.url);
+  final SourceType source;
+
+  /// Qiita：記事ID ／ Zenn：slug ／ note：key ／ GIGAZINE：記事ページのパス名
+  final String id;
+
+  /// 正規化した記事 URL
+  final String url;
+}
+
 /// 全文（サニタイズ前の HTML）
 class ArticleContent {
   ArticleContent({required this.html, this.imageUrls = const [], this.isPaidPartial = false});

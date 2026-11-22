@@ -41,6 +41,7 @@ class Sources {
       if (Settings.instance.failures(t) != 0) await Settings.instance.setFailures(t, 0);
       return r;
     } on SourceException catch (e) {
+      if (e.notFound) rethrow;
       if (e.rateLimited && t == SourceType.qiita) {
         await Settings.instance.setQiitaPausedUntil(nowMs() + hourMs);
         throw SourceException('Qiitaは一時的に取得できません', rateLimited: true);

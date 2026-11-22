@@ -61,6 +61,38 @@ class ZennSource implements ArticleSource, Enrichable {
 
   /// 一覧には本文の冒頭がないため、詳細を取って冒頭と最初の画像を補う。
   /// 取った本文は extra['html'] に入れ、全文表示で再取得しない
+  /// https://zenn.dev/{user}/articles/{slug}（Publication も同じ形。本・スクラップは対象外）
+  @override
+  ArticleRef? matchUrl(Uri url) {
+    final s = url.pathSegments;
+    if (url.host != 'zenn.dev' || s.length != 3 || s[1] != 'articles' || s[2].isEmpty) return null;
+    return ArticleRef(type, s[2], url.toString());
+  }
+
+  @override
+  Future<ArticleSummary> fetchByRef(ArticleRef ref) async {
+    final j = await _http.getJson(Uri.https('zenn.dev', '/api/articles/${ref.id}')) as Map<String, dynamic>;
+    final a = j['article'] as Map<String, dynamic>? ?? const {};
+    final html = a['body_html'] as String? ?? '';
+    if (html.isEmpty) throw SourceException('本文を取得できません（仕様変更の可能性）');
+    final url = a['path'] is String ? 'https://zenn.dev${a['path']}' : ref.url;
+    final images = extractImageUrls(html);
+    return ArticleSummary(
+      source: type,
+      sourceKey: normalizeUrl(url),
+      url: url,
+      title: a['title'] as String? ?? '',
+      author: (a['user'] as Map?)?['name'] as String? ?? (a['user'] as Map?)?['username'] as String?,
+      tags: [for (final t in (a['topics'] as List? ?? const [])) ((t as Map)['display_name'] ?? t['name']) as String],
+      summary: plainExcerpt(html),
+      thumbnailUrl: images.isEmpty ? null : images.first,
+      likes: a['liked_count'] as int? ?? 0,
+      publishedAt: parseTime(a['published_at']),
+      emoji: a['emoji'] as String?,
+      extra: {'slug': a['slug'] ?? ref.id, 'html': html},
+    );
+  }
+
   @override
   bool needsEnrich(ArticleSummary s) => s.summary == null || s.summary!.isEmpty;
 

@@ -62,6 +62,20 @@ class QiitaSource implements ArticleSource {
     return merged.take(limit.clamp(0, maxPopular)).toList();
   }
 
+  static final _id = RegExp(r'^[0-9a-f]{20}$');
+
+  /// https://qiita.com/{user}/items/{id}
+  @override
+  ArticleRef? matchUrl(Uri url) {
+    final s = url.pathSegments;
+    if (url.host != 'qiita.com' || s.length != 3 || s[1] != 'items' || !_id.hasMatch(s[2])) return null;
+    return ArticleRef(type, s[2], url.toString());
+  }
+
+  @override
+  Future<ArticleSummary> fetchByRef(ArticleRef ref) async =>
+      _toSummary(await _http.getJson(Uri.https('qiita.com', '/api/v2/items/${ref.id}')) as Map<String, dynamic>);
+
   @override
   Future<ArticleContent> fetchContent(ArticleSummary summary) async {
     var html = summary.extra['html'] as String?;

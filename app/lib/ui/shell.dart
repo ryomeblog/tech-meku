@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../core/techmeku_icon.dart';
+import '../services/share_receiver.dart';
 import 'common/widgets.dart';
 import 'home/home_page.dart';
 import 'posts/editor_page.dart';
 import 'posts/my_posts_page.dart';
 import 'profile/profile_page.dart';
 import 'settings/settings_page.dart';
+import 'stock/url_save_sheet.dart';
 
 /// ボトムナビ：ホーム ／ 自分の投稿 ／ ＋新規投稿 ／ プロフィール ／ 設定
 class Shell extends StatefulWidget {
@@ -19,6 +21,28 @@ class Shell extends StatefulWidget {
 class _ShellState extends State<Shell> {
   int _index = 0;
   int _myPostsVisit = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    ShareReceiver.instance.text.addListener(_onShared);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onShared());
+  }
+
+  @override
+  void dispose() {
+    ShareReceiver.instance.text.removeListener(_onShared);
+    super.dispose();
+  }
+
+  /// 共有メニューから URL を受け取ったら、ホームの上に S17 を開く（v2.4）
+  void _onShared() {
+    final text = ShareReceiver.instance.text.value;
+    if (text == null || !mounted) return;
+    ShareReceiver.instance.clear();
+    Navigator.of(context).popUntil((r) => r.isFirst);
+    UrlSaveSheet.show(context, initialText: text);
+  }
 
   void _select(int i) {
     if (i == 2) {

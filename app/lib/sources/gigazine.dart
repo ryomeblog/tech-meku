@@ -67,6 +67,41 @@ class GigazineSource implements ArticleSource, Enrichable {
     return (await _latest()).where((a) => (a.publishedAt ?? 0) >= weekAgo).take(limit).toList();
   }
 
+  static final _slug = RegExp(r'^\d{8}-');
+
+  /// https://gigazine.net/news/{YYYYMMDD-slug}/
+  @override
+  ArticleRef? matchUrl(Uri url) {
+    final s = url.pathSegments;
+    if (url.host != 'gigazine.net' || s.length != 2 || s[0] != 'news' || !_slug.hasMatch(s[1])) return null;
+    return ArticleRef(type, s[1], url.toString());
+  }
+
+  /// 記事ページからタイトル・日時・カテゴリ・本文を取り出す
+  @override
+  Future<ArticleSummary> fetchByRef(ArticleRef ref) async {
+    final url = 'https://gigazine.net/news/${ref.id}/';
+    final page = await _http.getText(Uri.parse(url));
+    final html = extractGigazineBody(page);
+    if (html.isEmpty) throw SourceException('本文を取得できません（仕様変更の可能性）');
+    final doc = parser.parse(page);
+    final title = doc.querySelector('h1.title')?.text.trim() ??
+        doc.querySelector('meta[property="og:title"]')?.attributes['content']?.trim() ??
+        '';
+    final images = extractImageUrls(html);
+    return ArticleSummary(
+      source: type,
+      sourceKey: normalizeUrl(url),
+      url: url,
+      title: title,
+      tags: [for (final a in doc.querySelectorAll('.p-category a')) a.text.trim()].where((t) => t.isNotEmpty).toList(),
+      summary: plainExcerpt(html),
+      thumbnailUrl: images.isEmpty ? null : images.first,
+      publishedAt: parseTime(doc.querySelector('time[datetime]')?.attributes['datetime']),
+      extra: {'html': html},
+    );
+  }
+
   /// RSS に画像がないため、記事ページから最初の画像を補う（本文は全文表示で再利用）
   @override
   bool needsEnrich(ArticleSummary s) => s.thumbnailUrl == null && s.extra['html'] == null;

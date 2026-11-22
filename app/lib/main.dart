@@ -6,6 +6,7 @@ import 'core/settings.dart';
 import 'core/theme.dart';
 import 'services/auth.dart';
 import 'services/scheduler.dart';
+import 'services/share_receiver.dart';
 import 'services/stock.dart';
 import 'services/tags.dart';
 import 'ui/shell.dart';
@@ -21,6 +22,7 @@ Future<void> main() async {
   // 起動時に期限切れのキャッシュを削除（5.9）
   await StockRepo.instance.purgeExpiredCache();
   runApp(const TechMekuApp());
+  ShareReceiver.instance.init();
   Scheduler.apply();
   AuthService.instance.refresh();
 }

@@ -70,14 +70,60 @@ class NoteSource implements ArticleSource {
     return merged.take(limit).toList();
   }
 
+  static final _key = RegExp(r'^n[0-9a-f]+$');
+
+  /// https://note.com/{user}/n/{key}（独自ドメインの note は対象外）
+  @override
+  ArticleRef? matchUrl(Uri url) {
+    final s = url.pathSegments;
+    if (url.host != 'note.com' || s.length != 3 || s[1] != 'n' || !_key.hasMatch(s[2])) return null;
+    return ArticleRef(type, s[2], url.toString());
+  }
+
+  Future<Map<String, dynamic>> _detail(String key) async {
+    final j = await _http.getJson(Uri.https('note.com', '/api/v3/notes/$key')) as Map<String, dynamic>;
+    return j['data'] as Map<String, dynamic>? ?? const {};
+  }
+
+  static String _html(Map<String, dynamic> d) {
+    final eyecatch = d['eyecatch'] as String?;
+    return '${eyecatch != null ? '<p><img src="$eyecatch"></p>' : ''}${d['body'] as String? ?? ''}';
+  }
+
+  @override
+  Future<ArticleSummary> fetchByRef(ArticleRef ref) async {
+    final d = await _detail(ref.id);
+    final user = d['user'] as Map? ?? const {};
+    final url = user['urlname'] != null ? 'https://note.com/${user['urlname']}/n/${ref.id}' : ref.url;
+    final html = _html(d);
+    return ArticleSummary(
+      source: type,
+      sourceKey: normalizeUrl(url),
+      url: url,
+      title: d['name'] as String? ?? '',
+      author: user['nickname'] as String? ?? user['urlname'] as String?,
+      tags: [
+        for (final h in (d['hashtag_notes'] as List? ?? const []))
+          if ((h as Map)['hashtag'] is Map) ((h['hashtag'] as Map)['name'] as String? ?? '').replaceFirst('#', ''),
+      ].where((t) => t.isNotEmpty).toList(),
+      summary: plainExcerpt((d['description'] as String?) ?? (d['body'] as String? ?? '')),
+      thumbnailUrl: d['eyecatch'] as String?,
+      likes: d['like_count'] as int? ?? 0,
+      publishedAt: parseTime(d['publish_at']),
+      isPaidPartial: (d['price'] as int? ?? 0) > 0,
+      extra: {'key': ref.id, 'html': html},
+    );
+  }
+
   @override
   Future<ArticleContent> fetchContent(ArticleSummary summary) async {
+    final cached = summary.extra['html'] as String?;
+    if (cached != null && cached.isNotEmpty) {
+      return ArticleContent(html: cached, imageUrls: extractImageUrls(cached), isPaidPartial: summary.isPaidPartial);
+    }
     final key = summary.extra['key'] as String? ?? Uri.parse(summary.url).pathSegments.last;
-    final j = await _http.getJson(Uri.https('note.com', '/api/v3/notes/$key')) as Map<String, dynamic>;
-    final d = j['data'] as Map<String, dynamic>? ?? const {};
-    final body = d['body'] as String? ?? '';
-    final eyecatch = d['eyecatch'] as String?;
-    final html = '${eyecatch != null ? '<p><img src="$eyecatch"></p>' : ''}$body';
+    final d = await _detail(key);
+    final html = _html(d);
     final paid = (d['price'] as int? ?? 0) > 0;
     return ArticleContent(html: html, imageUrls: extractImageUrls(html), isPaidPartial: paid);
   }

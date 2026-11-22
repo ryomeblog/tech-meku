@@ -210,6 +210,88 @@ ${items.map((i) => '<item><title>${i.$1}</title><link>https://gigazine.net/news/
     });
   });
 
+  group('URL の判定（v2.4）', () {
+    final sources = [QiitaSource(), ZennSource(), NoteSource(), GigazineSource()];
+    ArticleRef? match(String text) {
+      final u = articleUri(text);
+      if (u == null) return null;
+      for (final s in sources) {
+        final r = s.matchUrl(u);
+        if (r != null) return r;
+      }
+      return null;
+    }
+
+    test('4 サイトの記事 URL を判定し、表記ゆれでも同じ記事になる', () {
+      final q = match('https://qiita.com/user/items/2c48062229b25286d072')!;
+      expect((q.source, q.id), (SourceType.qiita, '2c48062229b25286d072'));
+      expect(match('http://qiita.com/user/items/2c48062229b25286d072/?utm_source=x#sec')!.url, q.url);
+      final z = match('https://zenn.dev/headwaters/articles/e2aef1de50c368')!;
+      expect((z.source, z.id), (SourceType.zenn, 'e2aef1de50c368'));
+      final n = match('https://note.com/me/n/n278d8dee9505?magazine_key=x')!;
+      expect((n.source, n.id), (SourceType.note, 'n278d8dee9505'));
+      final g = match('https://gigazine.net/news/20261105-uniqlo-kyoto-open-event-guide/')!;
+      expect((g.source, g.id), (SourceType.gigazine, '20261105-uniqlo-kyoto-open-event-guide'));
+    });
+
+    test('対象外の URL は判定しない', () {
+      for (final u in [
+        'https://zenn.dev/user/books/my-book',
+        'https://zenn.dev/user/scraps/abc',
+        'https://zenn.dev/user',
+        'https://qiita.com/user',
+        'https://qiita.com/user/items/not-an-id',
+        'https://note.com/me',
+        'https://blog.example.com/n/n278d8dee9505',
+        'https://gigazine.net/news/C10/',
+        'https://example.com/blog/1',
+        'ftp://qiita.com/user/items/2c48062229b25286d072',
+        'ただの文章',
+      ]) {
+        expect(match(u), isNull, reason: u);
+      }
+    });
+
+    test('共有テキストから最初の URL を取り出す', () {
+      expect(extractFirstUrl('面白い記事 https://zenn.dev/a/articles/b #Flutter'), 'https://zenn.dev/a/articles/b');
+      expect(extractFirstUrl('「記事」（https://qiita.com/u/items/x）。'), 'https://qiita.com/u/items/x');
+      expect(extractFirstUrl('https://a.com/1 と https://b.com/2'), 'https://a.com/1');
+      expect(extractFirstUrl('URL なし'), isNull);
+    });
+
+    test('URL から 1 件取得：Zenn・note・GIGAZINE（本文も一緒に取り、保存時に再取得しない）', () async {
+      final now = DateTime.now().toIso8601String();
+      final client = MockClient((req) async {
+        final body = switch (req.url.host) {
+          'zenn.dev' => jsonEncode({'article': {'slug': 's1', 'path': '/u/articles/s1', 'title': 'Zenn記事', 'body_html': '<p>冒頭</p><img src="https://img/z.png">', 'liked_count': 3, 'published_at': now, 'emoji': '🦀', 'user': {'name': 'U'}, 'topics': [{'name': 'rust', 'display_name': 'Rust'}]}}),
+          'note.com' => jsonEncode({'data': {'name': 'note記事', 'body': '<p>本文</p>', 'price': 500, 'like_count': 9, 'publish_at': now, 'eyecatch': 'https://img/e.png', 'user': {'urlname': 'me', 'nickname': 'Me'}, 'hashtag_notes': [{'hashtag': {'name': '#AI'}}]}}),
+          _ => '<html><head><meta property="og:title" content="og"></head><body><div id="article"><div class="cntimage"><time datetime="$now">日時</time><span class="yeartime p-category"><a href="/news/C1/">AI</a></span><h1 class="title">GIGA記事</h1><p class="preface">本文です</p><img src="https://i.gzn.jp/a.jpg"></div><!-- google_ad_section_end --></div></body></html>',
+        };
+        return http.Response.bytes(utf8.encode(body), 200);
+      });
+      final h = SourceHttp(client);
+      final z = await ZennSource(h).fetchByRef(const ArticleRef(SourceType.zenn, 's1', 'https://zenn.dev/u/articles/s1'));
+      expect((z.title, z.author, z.thumbnailUrl, z.emoji), ('Zenn記事', 'U', 'https://img/z.png', '🦀'));
+      expect(z.tags, ['Rust']);
+      expect(z.summary, '冒頭');
+      final n = await NoteSource(h).fetchByRef(const ArticleRef(SourceType.note, 'n1a', 'https://note.com/me/n/n1a'));
+      expect((n.title, n.url, n.isPaidPartial), ('note記事', 'https://note.com/me/n/n1a', true));
+      expect(n.tags, ['AI']);
+      expect((await NoteSource(h).fetchContent(n)).html, contains('<img src="https://img/e.png">'));
+      final g = await GigazineSource(h).fetchByRef(const ArticleRef(SourceType.gigazine, '20261105-x', 'https://gigazine.net/news/20261105-x'));
+      expect((g.title, g.thumbnailUrl), ('GIGA記事', 'https://i.gzn.jp/a.jpg'));
+      expect(g.tags, ['AI']);
+      expect(g.publishedAt, isNotNull);
+      expect(g.extra['html'], contains('本文です'));
+    });
+
+    test('存在しない記事は notFound として扱う', () async {
+      final q = QiitaSource(SourceHttp(MockClient((_) async => http.Response('', 404))));
+      expect(() => q.fetchByRef(const ArticleRef(SourceType.qiita, '0000000000000000aaaa', 'https://qiita.com/u/items/0000000000000000aaaa')),
+          throwsA(isA<SourceException>().having((e) => e.notFound, 'notFound', true)));
+    });
+  });
+
   group('note', () {
     test('有料記事の判定、直近7日のいいね順、URL の組み立て', () async {
       final now = DateTime.now();
