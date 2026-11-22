@@ -139,21 +139,33 @@ h2.group{max-width:1280px;margin:28px auto 0;padding:0 16px;font-size:15px}
 .endcard .big .ic{width:40px;height:40px}
 .avatar{width:52px;height:52px;border-radius:50%;flex:none;background:var(--box2);display:flex;align-items:center;justify-content:center}
 .avatar .ic{width:26px;height:26px}
+/* v2.4 で追加した要素の強調 */
+.v24{outline:2px dashed var(--accent);outline-offset:2px;border-radius:6px}
+.input{border:1.5px solid var(--accent);border-radius:8px;padding:8px;font-size:12px;margin-bottom:6px;word-break:break-all}
+.input.ph{border-color:var(--line);color:var(--sub)}
+.handle{width:36px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 4px}
+.btn.dis{opacity:.4}
+.sites div{font-size:11px;color:var(--sub);padding:2px 0}
+.sites b{color:var(--ink);display:inline-block;width:70px}
+.share{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:10px 12px 14px}
+.share div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--sub)}
+.share i{width:40px;height:40px;border-radius:12px;background:var(--box2);display:block}
+.share img{width:40px;height:40px;border-radius:12px}
 </style>
 </head>
 <body>
 <header class="top">
   <img src="../app/assets/brand/techmeku_icon_192.png" alt="TechMeku アイコン">
   <div>
-    <h1>TechMeku ワイヤーフレーム v2.2</h1>
-    <p>技術を、めくって発見する。 ／ design.md v2.2 と対応（画面IDは設計書3章）</p>
+    <h1>TechMeku ワイヤーフレーム v2.4</h1>
+    <p>技術を、めくって発見する。 ／ design.md v2.4 と対応（画面IDは設計書3章）</p>
   </div>
 </header>
-<div class="legend"><span>アイコン：TechMeku Icon Kit（SVG）。通常＝本文色、選択中＝active色（シアン）</span><span><i style="background:var(--note);border:1px solid var(--noteLine)"></i>実装メモ</span><span><i style="background:var(--new);border:1px solid var(--newLine)"></i>v2で追加・変更した点</span></div>
+<div class="legend"><span>アイコン：TechMeku Icon Kit（SVG）。通常＝本文色、選択中＝active色（シアン）</span><span><i style="background:var(--note);border:1px solid var(--noteLine)"></i>実装メモ</span><span><i style="background:var(--new);border:1px solid var(--newLine)"></i>v2で追加・変更した点</span><span><i style="outline:2px dashed var(--accent);outline-offset:-2px"></i>v2.4（URLから保存）で追加した要素</span></div>
 <nav class="toc">
   <a href="#s01">S01 おすすめ</a><a href="#s02">S02 ストック</a><a href="#s03">S03 みんなの投稿</a><a href="#s04">S04 全文</a><a href="#s05">S05 状態カード</a><a href="#s06">S06 一括DL</a>
   <a href="#s07">S07 興味タグ</a><a href="#s08">S08 プロフィール</a><a href="#s09">S09 自分の投稿</a><a href="#s10">S10 いいね</a>
-  <a href="#s11">S11 エディタ</a><a href="#s12">S12 コメント</a><a href="#s13">S13 ログイン</a><a href="#s14">S14 設定</a><a href="#s15">S15 DLしたもの</a><a href="#s16">S16 ダイアログ</a><a href="#a01">A01 管理</a>
+  <a href="#s11">S11 エディタ</a><a href="#s12">S12 コメント</a><a href="#s13">S13 ログイン</a><a href="#s14">S14 設定</a><a href="#s15">S15 DLしたもの</a><a href="#s16">S16 ダイアログ</a><a href="#s17">S17 URLから保存</a><a href="#a01">A01 管理</a>
 </nav>
 
 <h2 class="group">ホーム（3タブ・上下スワイプ）</h2>
@@ -202,10 +214,10 @@ h2.group{max-width:1280px;margin:28px auto 0;padding:0 16px;font-size:15px}
     <div class="status"><span>9:41</span><span>オフライン</span></div>
     <div class="appbar" style="border:0;height:36px"><span class="logo"><img src="../app/assets/brand/techmeku_icon_192.png" alt="">Tech<b>Meku</b></span></div>
     <div class="tabs"><span><img class="ic" src="../app/assets/icons/default/layers.svg" alt="" aria-hidden="true">おすすめ</span><span class="on"><img class="ic ia" src="../app/assets/icons/active/bookmark.svg" alt="" aria-hidden="true">ストック</span><span><img class="ic" src="../app/assets/icons/default/users.svg" alt="" aria-hidden="true">みんなの投稿</span></div>
-    <div class="chips"><span class="chip on">すべて</span><span class="chip">Qiita</span><span class="chip">Zenn</span><span class="chip">note</span><span class="chip">投稿</span></div>
+    <div class="chips"><span class="chip on">すべて</span><span class="chip">Qiita</span><span class="chip">Zenn</span><span class="chip">note</span><span class="chip">GIGAZINE</span><span class="chip">投稿</span></div>
     <div class="body">
       <div class="card">
-        <div class="info"><b>128件</b> ・ 2.46 / 3 GB ・ 前回更新 今日 7:00 ・ <span style="color:var(--accent)"><img class="ic ia" src="../app/assets/icons/active/download.svg" alt="" aria-hidden="true">一括DL</span></div>
+        <div class="info"><b>128件</b> ・ 2.46 / 3 GB ・ 前回更新 今日 7:00 ・ <span style="color:var(--accent)"><img class="ic ia" src="../app/assets/icons/active/download.svg" alt="" aria-hidden="true">一括DL</span> <span class="v24" style="color:var(--accent);padding:0 3px"><img class="ic ia" src="../app/assets/icons/active/plus.svg" alt="" aria-hidden="true">URL</span></div>
         <div class="img" style="height:130px">サムネイル（保存済み画像）</div>
         <div class="meta">Qiita ・ @author ・ <img class="ic" src="../app/assets/icons/default/heart.svg" alt="" aria-hidden="true">1,240 ・ <span class="badge ok"><img class="ic" src="../app/assets/icons/default/smartphone.svg" alt="" aria-hidden="true">オフラインで読めます</span></div>
         <div class="title">記事タイトルが入ります。2行まで表示…</div>
@@ -228,6 +240,7 @@ h2.group{max-width:1280px;margin:28px auto 0;padding:0 16px;font-size:15px}
     <li>カード表示＝閲覧済、全文を開く＝既読</li>
     <li>未閲覧の最後から5番目を表示したら一括取得（入れ替え）。モバイル通信でも実行</li>
     <li>新しい記事は残りの未閲覧の後ろに追加。残り4件は見終わってからキャッシュへ</li>
+    <li>（v2.4）見出しの「＋URL」で URLから保存シート（S17）を開く</li>
   </ul></div>
 </section>
 
@@ -347,6 +360,150 @@ h2.group{max-width:1280px;margin:28px auto 0;padding:0 16px;font-size:15px}
 </section>
 </div>
 
+<h2 class="group">URLから保存（v2.4）</h2>
+<div class="grid">
+
+<!-- S17 -->
+<section class="screen" id="s17">
+  <h3>S17-1 URLから保存：入力<small>ストック・プロフィールの「＋URL」から</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="body">
+      <div class="img" style="position:absolute;inset:0;border-radius:0;align-items:flex-start;padding-top:40px">（背面：S02 ストック）</div><div class="scrim"></div>
+      <div class="sheet">
+        <div class="handle"></div><div class="appbar" style="border:0;height:36px"><span><img class="ic" src="../app/assets/icons/default/plus.svg" alt="" aria-hidden="true"> URLから保存</span><span class="sp"></span><span class="ib"><img class="ic" src="../app/assets/icons/default/close.svg" alt="" aria-hidden="true"></span></div>
+        <div class="pad">
+          <div class="input ph">記事のURLを入力（例：https://zenn.dev/…/articles/…）</div>
+          <div style="display:flex;gap:6px"><span class="btn">貼り付け</span><span class="sp" style="flex:1"></span></div>
+          <div class="sites info" style="margin-top:6px"><div style="color:var(--ink);font-weight:600;margin-bottom:2px"><img class="ic" src="../app/assets/icons/default/info.svg" alt="" aria-hidden="true"> 対応しているURL</div><div><b>Qiita</b>qiita.com/…/items/…</div><div><b>Zenn</b>zenn.dev/…/articles/…</div><div><b>note</b>note.com/…/n/…</div><div><b>GIGAZINE</b>gigazine.net/news/…</div></div>
+          <div style="height:10px"></div>
+          <span class="btn pri full dis"><img class="ic" src="../app/assets/icons/default/download.svg" alt="" aria-hidden="true">ストックに保存</span>
+          <div style="height:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes new"><ul>
+    <li>ストック見出しの「＋URL」（S02）、またはプロフィールのストックの「＋URLから保存」（S08）で開くボトムシート。背面はそれぞれの画面</li>
+    <li>「貼り付け」でクリップボードの URL を入れる（開いただけでは読まない）</li>
+    <li>入力のたびに形式を端末内で判定（通信しない）。対応URLなら自動でプレビュー取得</li>
+    <li>対応サイトは設定の ON/OFF に関係なく使える【設計判断】</li>
+  </ul></div>
+</section>
+
+<section class="screen">
+  <h3>S17-2 URLから保存：プレビュー<small>対応URLを判定 → 記事情報を取得</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="body">
+      <div class="img" style="position:absolute;inset:0;border-radius:0;align-items:flex-start;padding-top:40px">（背面：S02 ストック）</div><div class="scrim"></div>
+      <div class="sheet">
+        <div class="handle"></div><div class="appbar" style="border:0;height:36px"><span><img class="ic" src="../app/assets/icons/default/plus.svg" alt="" aria-hidden="true"> URLから保存</span><span class="sp"></span><span class="ib"><img class="ic" src="../app/assets/icons/default/close.svg" alt="" aria-hidden="true"></span></div>
+        <div class="pad">
+          <div class="input">https://qiita.com/author/items/1a2b3c4d5e6f7a8b9c0d</div>
+          <div class="meta"><span class="badge acc"><img class="ic ia" src="../app/assets/icons/active/check_circle.svg" alt="" aria-hidden="true">Qiita の記事</span></div>
+          <div class="row" style="padding:10px 0;border-bottom:0">
+            <div class="thumb img">画像</div>
+            <div class="t"><b>Flutter で縦スワイプの記事リーダーを作った話</b><div class="meta">Qiita ・ @author ・ 2026/11/12 ・ <img class="ic" src="../app/assets/icons/default/heart.svg" alt="" aria-hidden="true">240</div><div><span class="badge">#Flutter</span> <span class="badge">#Dart</span></div></div>
+          </div>
+          <span class="btn pri full"><img class="ic" src="../app/assets/icons/default/download.svg" alt="" aria-hidden="true">ストックに保存</span>
+          <div class="meta" style="margin-top:6px">本文と画像を端末に保存します。個別DLと同じ扱いで、一括DLの入れ替えでは消えません。</div>
+          <div style="height:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes new"><ul>
+    <li>判定できたらサイト名のバッジを出し、記事を 1 件取得してプレビュー（5.10）</li>
+    <li>取得中は行の位置にスピナー（<img class="ic" src="../app/assets/icons/default/loader.svg" alt="" aria-hidden="true">）</li>
+    <li>note の有料記事は「有料記事（無料部分のみ）」バッジ</li>
+    <li><b>保存済み</b>のとき：バッジ「<img class="ic" src="../app/assets/icons/default/check_circle.svg" alt="" aria-hidden="true">保存済み」、ボタンは「<img class="ic" src="../app/assets/icons/default/book_open.svg" alt="" aria-hidden="true">読む」。一括DL由来なら manual に切り替え、キャッシュにあればストックに戻す</li>
+  </ul></div>
+</section>
+
+<section class="screen">
+  <h3>S17-3 URLから保存：完了<small>保存後</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="body">
+      <div class="img" style="position:absolute;inset:0;border-radius:0;align-items:flex-start;padding-top:40px">（背面：S02 ストック）</div><div class="scrim"></div>
+      <div class="sheet">
+        <div class="handle"></div><div class="appbar" style="border:0;height:36px"><span><img class="ic" src="../app/assets/icons/default/plus.svg" alt="" aria-hidden="true"> URLから保存</span><span class="sp"></span><span class="ib"><img class="ic" src="../app/assets/icons/default/close.svg" alt="" aria-hidden="true"></span></div>
+        <div class="pad" style="text-align:center">
+          <div style="font-size:34px;margin:6px 0"><img class="ic ia" style="width:44px;height:44px" src="../app/assets/icons/active/check_circle.svg" alt="" aria-hidden="true"></div>
+          <div class="title" style="font-size:15px">ストックに保存しました</div>
+          <div class="meta" style="margin:4px 0 12px">Flutter で縦スワイプの記事リーダーを作った話</div>
+          <span class="btn pri full"><img class="ic" src="../app/assets/icons/default/book_open.svg" alt="" aria-hidden="true">読む</span>
+          <div style="height:6px"></div>
+          <span class="btn full"><img class="ic" src="../app/assets/icons/default/plus.svg" alt="" aria-hidden="true">続けて追加</span>
+          <div style="height:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes new"><ul>
+    <li>「読む」で全文（S04、ローカル表示）。「続けて追加」で入力欄を空にして S17-1 へ</li>
+    <li>保存した記事はストックの末尾に未閲覧として追加。プロフィールのストック（S08）にも並ぶ</li>
+    <li>容量上限を超えたら S16 の容量超過ダイアログ（保存は続行）</li>
+  </ul></div>
+</section>
+
+<section class="screen">
+  <h3>S17-4 URLから保存：エラー<small>シート内に表示・やり直せる</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="body">
+      <div class="img" style="position:absolute;inset:0;border-radius:0;align-items:flex-start;padding-top:40px">（背面：S02 ストック）</div><div class="scrim"></div>
+      <div class="sheet">
+        <div class="handle"></div><div class="appbar" style="border:0;height:36px"><span><img class="ic" src="../app/assets/icons/default/plus.svg" alt="" aria-hidden="true"> URLから保存</span><span class="sp"></span><span class="ib"><img class="ic" src="../app/assets/icons/default/close.svg" alt="" aria-hidden="true"></span></div>
+        <div class="pad">
+          <div class="input" style="border-color:var(--warn)">https://example.com/blog/2026/11/hello</div>
+          <div class="meta" style="color:var(--warn)"><img class="ic" src="../app/assets/icons/default/warning.svg" alt="" aria-hidden="true"> 対応していないURLです</div>
+          <div class="sites info" style="margin-top:6px"><div style="color:var(--ink);font-weight:600;margin-bottom:2px"><img class="ic" src="../app/assets/icons/default/info.svg" alt="" aria-hidden="true"> 対応しているURL</div><div><b>Qiita</b>qiita.com/…/items/…</div><div><b>Zenn</b>zenn.dev/…/articles/…</div><div><b>note</b>note.com/…/n/…</div><div><b>GIGAZINE</b>gigazine.net/news/…</div></div>
+          <div style="height:10px"></div>
+          <span class="btn pri full dis"><img class="ic" src="../app/assets/icons/default/download.svg" alt="" aria-hidden="true">ストックに保存</span>
+          <div style="height:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ul>
+    <li><b>対応していないURL</b>：上の表示（Zenn の本・スクラップ、note の独自ドメインも含む）</li>
+    <li><b>記事が見つかりません</b>：削除・非公開・限定公開（404）</li>
+    <li><b>取得できませんでした</b>：通信エラー。3回続くと「仕様変更の可能性」</li>
+    <li><b>Qiitaは一時的に取得できません</b>：レート制限（60回/時）</li>
+    <li><b>オフラインです。接続すると保存できます</b>：入力はできるが取得・保存は不可（送信待ちにしない）【設計判断】</li>
+  </ul></div>
+</section>
+
+<section class="screen">
+  <h3>S17-5 共有メニューから<small>Chrome・X・Slack などで共有 → TechMeku</small></h3>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>Wi-Fi ▮▮▮</span></div>
+    <div class="appbar"><span class="ib"><img class="ic" src="../app/assets/icons/default/close.svg" alt="" aria-hidden="true"></span><span class="meta" style="border:1px solid var(--line);border-radius:999px;padding:2px 10px;flex:1">zenn.dev/author/articles/…</span></div>
+    <div class="body">
+      <div class="pad"><div class="title">（ブラウザで開いている記事）</div><div class="lines"><span></span><span></span><span style="width:60%"></span><span></span></div></div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="pad" style="padding-bottom:0"><b>共有</b><div class="meta">zenn.dev/author/articles/abc123</div></div>
+        <div class="share">
+          <div class="v24"><img src="../app/assets/brand/techmeku_icon_192.png" alt="">TechMeku</div>
+          <div><i></i>Gmail</div><div><i></i>Slack</div><div><i></i>X</div>
+          <div><i></i>メモ</div><div><i></i>Drive</div><div><i></i>コピー</div><div><i></i>その他</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes new"><ul>
+    <li>Android の共有メニューに TechMeku を出す（<span class="mono">ACTION_SEND text/plain</span>）</li>
+    <li>選ぶと TechMeku が開き、ホームの上に S17 を表示。URL は入力済みで、そのまま S17-2（プレビュー）へ</li>
+    <li>共有テキストに文章やタグが混ざっていても、最初の対応URLを取り出す。複数あれば最初の1件【設計判断】</li>
+    <li>アプリが起動していなくても、起動後に S17 を開く</li>
+  </ul></div>
+</section>
+</div>
+
 <h2 class="group">興味タグ・自分の投稿・プロフィール</h2>
 <div class="grid">
 
@@ -388,6 +545,7 @@ h2.group{max-width:1280px;margin:28px auto 0;padding:0 16px;font-size:15px}
         <div style="flex:1;min-width:0"><b>ユーザー4821</b> <span class="meta"><img class="ic" src="../app/assets/icons/default/edit.svg" alt="" aria-hidden="true"></span><div class="meta">#AI #Flutter #Go <span style="color:var(--accent)"><img class="ic ia" src="../app/assets/icons/active/tag.svg" alt="" aria-hidden="true">タグ</span></div></div>
       </div>
       <div class="tabs" style="border-bottom:1px solid var(--line)"><span class="on"><img class="ic ia" src="../app/assets/icons/active/library.svg" alt="" aria-hidden="true">ストック 12</span><span><img class="ic" src="../app/assets/icons/default/heart.svg" alt="" aria-hidden="true">いいね 24</span></div>
+      <div class="row"><span class="v24" style="color:var(--accent);font-weight:600;padding:2px 6px"><img class="ic ia" src="../app/assets/icons/active/plus.svg" alt="" aria-hidden="true"> URLから保存</span><span class="meta" style="flex:1;text-align:right">Qiita・Zenn・note・GIGAZINE</span></div>
       <div class="row"><span class="thumb img"></span><div class="t"><b>Cloudflare D1入門</b><span class="meta">Zenn ・ 1.1MB ・ <img class="ic ia" src="../app/assets/icons/active/heart_filled.svg" alt="" aria-hidden="true"></span></div></div>
       <div class="row"><span class="thumb img"></span><div class="t"><b>Riverpodの設計パターン</b><span class="meta">Qiita ・ 2.0MB ・ <span class="badge acc">既読</span></span></div></div>
       <div class="row"><span class="thumb img"></span><div class="t"><b>投稿記事のタイトル</b><span class="meta">投稿 ・ 0.4MB ・ <span class="badge">公開終了</span></span></div></div>
@@ -400,6 +558,7 @@ h2.group{max-width:1280px;margin:28px auto 0;padding:0 16px;font-size:15px}
     <li>個別DLした記事（投稿のDL含む）だけを表示。入れ替えでは消えない</li>
     <li>タップ→S04、スワイプで削除</li>
     <li>未ログイン：ヘッダーに「ログイン」。ストック・いいねは使える</li>
+    <li>（v2.4）一覧の先頭の「＋URLから保存」で S17 を開く。保存した記事はシートを閉じるとすぐこの一覧に並ぶ</li>
   </ul></div>
 </section>
 
